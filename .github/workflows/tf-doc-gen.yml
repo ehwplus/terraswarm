@@ -1,0 +1,26 @@
+name: Generate terraform docs
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ./modules/**/*.tf
+  # - pull_request
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # with:
+      #   ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Inject terraform docs for every module
+        uses: terraform-docs/gh-actions@v1.0.0
+        with:
+          working-dir: ./modules/
+          output-file: README.md
+          output-method: inject
+          recursive: "true"
+          git-push: "true"
+          git-push-sign-off: "true"
