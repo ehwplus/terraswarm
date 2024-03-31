@@ -7,3 +7,29 @@ The modules are designed to spawn swarm resources.
 ## Contribution
 
 Please feel free to contribute your own modules. Modules shall be based on top of the [base_docker_service](./modules/base_docker_service/) and [base_docker_volume](./modules/base_docker_volume/).
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+No requirements.
+
+## Providers
+
+No providers.
+
+## Modules
+
+No modules.
+
+## Resources
+
+No resources.
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->
