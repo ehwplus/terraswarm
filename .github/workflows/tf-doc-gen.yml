@@ -18,9 +18,10 @@ jobs:
       - name: Inject terraform docs for every module
         uses: terraform-docs/gh-actions@v1.0.0
         with:
-          working-dir: .
+          working-dir: "./modules/"
           output-file: README.md
           output-method: inject
           recursive: "true"
+          recursive-path: "."
           git-push: "true"
           git-push-sign-off: "true"
