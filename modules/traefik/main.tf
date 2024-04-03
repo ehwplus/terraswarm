@@ -13,8 +13,8 @@ locals {
       read_only = true
     },
     {
-      target    = "/certificates"
-      source    = module.docker_volume.this.name
+      target    = "/etc/certs"
+      source    = module.traefik_docker_volume.this.name
       type      = "volume"
       read_only = false
     }
@@ -73,7 +73,6 @@ module "traefik_docker_service" {
   env         = var.env
   constraints = var.constraints
   mode        = var.mode
-
   limit       = var.limit
   reservation = var.reservation
   labels      = var.labels

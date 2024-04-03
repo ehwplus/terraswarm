@@ -30,7 +30,7 @@ locals {
   this_config_file_name = "/etc/otelcol/config.yaml"
 }
 
-module "base_docker_service" {
+module "opentelemetry_docker_service" {
   source      = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
   name        = local.name
   namespace   = local.namespace
