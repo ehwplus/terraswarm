@@ -31,7 +31,7 @@ locals {
 }
 
 module "base_docker_service" {
-  source      = "../base_docker_service"
+  source      = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
   name        = local.name
   namespace   = local.namespace
   image       = local.image
