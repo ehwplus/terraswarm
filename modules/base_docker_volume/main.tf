@@ -8,9 +8,9 @@ locals {
 }
 
 resource "docker_volume" "this" {
-  name           = substr(join("_", compact([var.namespace, "vol", var.name, uuid()])), 0, 63)
-  driver         = var.driver
-  driver_options = var.driver_options
+  name        = substr(join("_", compact([var.namespace, "vol", var.name, uuid()])), 0, 63)
+  driver      = var.driver
+  driver_opts = var.driver_options
 
   dynamic "labels" {
     for_each = var.namespace == null ? [] : [1]

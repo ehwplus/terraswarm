@@ -65,7 +65,7 @@ resource "docker_service" "this" {
   }
 
   dynamic "auth" {
-    for_each = var.auth == null ? [] : [1]
+    for_each = nonsensitive(var.auth) == null ? [] : [1]
     content {
       server_address = var.auth.server_address
       username       = var.auth.username
