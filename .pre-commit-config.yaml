@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.88.4 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
+    hooks:
+      - id: terraform_tflint
+        args:
+          - --args=--color
+          - --args=--recursive
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+      - id: terraform_validate
+      - id: terraform_fmt
+      - id: terraform_tfsec
+      - id: terraform_docs
