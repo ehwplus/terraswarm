@@ -15,7 +15,7 @@ locals {
   ]
 
   name      = coalesce(var.name, "opentelemetry")
-  namespace = coalesce(var.namespace, "tracing")
+  namespace = coalesce(var.namespace, "o11y")
   image_tag = coalesce(var.image_tag, "0.90.1")
 
   image = coalesce(var.image, "otel/opentelemetry-collector")
@@ -55,7 +55,7 @@ module "base_docker_service" {
     {
       config_data = var.config
       file_name   = local.this_config_file_name
-      # file_mode   = 0777
+      file_mode   = 0700
     }
   ]
 }
