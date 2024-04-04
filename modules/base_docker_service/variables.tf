@@ -316,15 +316,15 @@ variable "healthcheck" {
     start_period = optional(string, "0s")
   })
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.healthcheck.interval))
+    condition     = var.healthcheck == null || can(regex("^([0-9]+s)$", var.healthcheck.interval))
     error_message = "Invalid interval input, must comply with regex '^([0-9]+s)$'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.healthcheck.timeout))
+    condition     = var.healthcheck == null || can(regex("^([0-9]+s)$", var.healthcheck.timeout))
     error_message = "Invalid timeout input, must comply with regex '^([0-9]+s)$'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.healthcheck.start_period))
+    condition     = var.healthcheck == null || can(regex("^([0-9]+s)$", var.healthcheck.start_period))
     error_message = "Invalid start_period input, must comply with regex '^([0-9]+s)$'."
   }
   description = <<EOT
