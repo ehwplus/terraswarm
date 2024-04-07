@@ -69,9 +69,9 @@ variable "secret_map" {
   }))
   validation {
     condition = can(alltrue([
-      for value in var.secret_map : regex("^(0?[0-9]{3})$", value.file_mode)
+      for key in var.secret_map : var.secret_map[key].file_mode == null || regex("^(0?[0-7]{3})$", var.secret_map[key].file_mode)
     ]))
-    error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-9]{3})$'."
+    error_message = "Invalid secret_map.[key].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
   }
   description = <<EOT
     (Optional) Similar to the secrets variable but allows for docker secret creation from terraform resources.
@@ -84,7 +84,6 @@ variable "secret_map" {
         file_mode   = Represents represents the FileMode of the file. Defaults to '0o444'.
         file_uid    = Represents the file UID. Defaults to '0'.
         secret_name = Name of the secret that this references, but this is just provided for lookup/display purposes. The config in the reference will be identified by its ID.
-
       }
     }
   EOT
@@ -103,9 +102,9 @@ variable "configs" {
   }))
   validation {
     condition = can(alltrue([
-      for value in var.configs : value.file_mode == null || regex("^(0?[0-7]{3})$", value.file_mode)
+      for config in var.configs : config.file_mode == null || regex("^(0?[0-7]{3})$", config.file_mode)
     ]))
-    error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-7]{3})$'."
+    error_message = "Invalid configs.[].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
   }
   description = <<EOT
     configs = [{
@@ -271,13 +270,13 @@ variable "ports" {
     condition = can(alltrue([
       for port in var.ports : regex("^(tcp|udp|sctp)$", port.protocol)
     ]))
-    error_message = "Invalid port.[].protocol input, must be one of: \"tcp\", \"udp\", \"sctp\"."
+    error_message = "Invalid ports.[].protocol input, must be one of: \"tcp\", \"udp\", \"sctp\"."
   }
   validation {
     condition = can(alltrue([
       for port in var.ports : regex("^(ingress|host)$", port.publish_mode)
     ]))
-    error_message = "Invalid port.[].publish_mode input, must be one of: \"ingress\", \"host\"."
+    error_message = "Invalid ports.[].publish_mode input, must be one of: \"ingress\", \"host\"."
   }
   description = <<EOT
     ports = [{
