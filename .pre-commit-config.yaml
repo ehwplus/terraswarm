@@ -8,6 +8,12 @@ repos:
           - --args=--recursive
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
       - id: terraform_validate
+        args:
+          - --hook-config=--retry-once-with-cleanup=true # Boolean. true or false
       - id: terraform_fmt
-      - id: terraform_tfsec
+      # - id: terraform_tfsec # deprecated
+      - id: terraform_trivy
+        args:
+          - --args=--format=json
+          - --args=--skip-dirs="**/.terraform"
       - id: terraform_docs
