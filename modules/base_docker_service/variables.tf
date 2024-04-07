@@ -53,7 +53,7 @@ variable "secrets" {
     secret_name = optional(string, null)
     secret_data = string
   }))
-  description = "(Optional) The secrets to create with and add to the docker container"
+  description = "(Optional) The secrets to create with and add to the docker container. Creates docker secrets from non-terraform-resources."
   default     = []
 }
 
@@ -74,6 +74,8 @@ variable "secret_map" {
     error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-9]{3})$'."
   }
   description = <<EOT
+    (Optional) Similar to the secrets variable but allows for docker secret creation from terraform resources.
+    
     secret_map = {
       key = {
         file_name   = Represents the final filename in the filesystem.
@@ -101,9 +103,9 @@ variable "configs" {
   }))
   validation {
     condition = can(alltrue([
-      for value in var.configs : regex("^(0?[0-9]{3})$", value.file_mode)
+      for value in var.configs : value.file_mode == null || regex("^(0?[0-7]{3})$", value.file_mode)
     ]))
-    error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-9]{3})$'."
+    error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-7]{3})$'."
   }
   description = <<EOT
     configs = [{

@@ -1,7 +1,6 @@
 locals {
   # Create a map with statically defined keys
   # According to https://jeffbrown.tech/terraform-for-each-index/#Solutions_to_Terraform_for_each_Index_Issues
-  # TODO don't use idx as key (but config_name can be null)
   config_map = { for idx, config in tolist(var.configs) : coalesce(config.config_name, idx) => config }
   secret_map = merge(var.secret_map, { for _, secret in tolist(var.secrets) : secret.file_name => secret })
 
