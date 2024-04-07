@@ -63,9 +63,9 @@ variable "secret_map" {
   }))
   validation {
     condition = can(alltrue([
-      for value in var.secret_map : regex("^(0?[0-9]{3})$", value.file_mode)
+      for key in var.secret_map : var.secret_map[key].file_mode == null || regex("^(0?[0-7]{3})$", var.secret_map[key].file_mode)
     ]))
-    error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-9]{3})$'."
+    error_message = "Invalid var.secret_map[key].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
   }
   description = <<EOT
     secret_map = {
