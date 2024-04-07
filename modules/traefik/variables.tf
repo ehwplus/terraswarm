@@ -14,9 +14,9 @@ variable "namespace" {
   default     = null
 }
 
-variable "image" {
+variable "custom_image" {
   type        = string
-  description = "The docker image name excluding the image tag"
+  description = "A custom docker image name excluding the image tag. Make sure to specify the auth variable as well if the custom image is within a private registry."
 }
 
 variable "image_tag" {
@@ -81,35 +81,6 @@ variable "secret_map" {
     }
   EOT
   default     = {}
-}
-
-variable "configs" {
-  type = set(object({
-    file_name = string
-    # config_id   = string # config will be created and we take that resource id
-    file_gid    = optional(string)
-    file_mode   = optional(number, 0444)
-    file_uid    = optional(string)
-    config_name = optional(string, null)
-    config_data = string
-  }))
-  validation {
-    condition = can(alltrue([
-      for value in var.configs : regex("^(0?[0-9]{3})$", value.file_mode)
-    ]))
-    error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-9]{3})$'."
-  }
-  description = <<EOT
-    configs = [{
-      config_id   = ID of the specific config that we're referencing
-      file_name   = Represents the final filename in the filesystem
-      config_name = Name of the config that this references, but this is just provided for lookup/display purposes. The config in the reference will be identified by its ID
-      file_gid    = Represents the file GID. Defaults to '0'.
-      file_mode   = Represents represents the FileMode of the file. Defaults to '0o444'.
-      file_uid    = Represents the file UID. Defaults to '0'.
-    }]
-  EOT
-  default     = []
 }
 
 variable "mounts" {
@@ -341,15 +312,16 @@ variable "healthcheck" {
 
 variable "traefik_config" {
   type        = string
-  description = "The static config file for traefik"
+  description = "The static config file for traefik. Config can be passed via tftpl or inline string."
   default     = null
 }
 
-variable "dynamic_configs" {
-  type        = map(string)
-  description = "The dynamic config files for traefik"
-  default     = {}
-}
+# TODO volume vs file bind mount? Only really needed for TCP/HTTP reverse proxy pass to resources outside the Swarm cluster
+# variable "dynamic_configs" {
+#   type        = map(string)
+#   description = "The dynamic config files for traefik"
+#   default     = {}
+# }
 
 # variable "certificate" {
 #   type = object({
