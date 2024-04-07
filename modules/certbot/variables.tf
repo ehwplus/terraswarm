@@ -4,7 +4,7 @@
 
 variable "name" {
   type        = string
-  description = "The service name which must not be longer than 63 characters. This name will also be used as a network alias for all attached networks."
+  description = "The certbot service name. This name will also be used as a network alias for all attached networks."
   nullable    = false
 }
 
@@ -14,21 +14,15 @@ variable "namespace" {
   default     = null
 }
 
-variable "image" {
+variable "custom_image" {
   type        = string
-  description = "The docker image name excluding the image tag"
+  description = "A custom docker image name excluding the image tag. Make sure to specify the auth variable as well if the custom image is within a private registry."
 }
 
 variable "image_tag" {
   type        = string
   description = "(Optional) The image tag of the docker image. Defaults to: latest"
   default     = "latest"
-}
-
-variable "command" {
-  type        = list(string)
-  description = "(Optional) The command/entrypoint to be run in the image. According to the docker cli the override of the entrypoint is also passed to the command property and there is no entrypoint attribute in the ContainerSpec of the service."
-  default     = null
 }
 
 variable "args" {
@@ -87,35 +81,6 @@ variable "secret_map" {
     }
   EOT
   default     = {}
-}
-
-variable "configs" {
-  type = set(object({
-    file_name = string
-    # config_id   = string # config will be created and we take that resource id
-    file_gid    = optional(string)
-    file_mode   = optional(number, 0444)
-    file_uid    = optional(string)
-    config_name = optional(string, null)
-    config_data = string
-  }))
-  validation {
-    condition = can(alltrue([
-      for value in var.configs : regex("^(0?[0-9]{3})$", value.file_mode)
-    ]))
-    error_message = "Invalid configs.key.file_mode input, must comply with regex '^(0?[0-9]{3})$'."
-  }
-  description = <<EOT
-    configs = [{
-      config_id   = ID of the specific config that we're referencing
-      file_name   = Represents the final filename in the filesystem
-      config_name = Name of the config that this references, but this is just provided for lookup/display purposes. The config in the reference will be identified by its ID
-      file_gid    = Represents the file GID. Defaults to '0'.
-      file_mode   = Represents represents the FileMode of the file. Defaults to '0o444'.
-      file_uid    = Represents the file UID. Defaults to '0'.
-    }]
-  EOT
-  default     = []
 }
 
 variable "mounts" {
@@ -235,7 +200,7 @@ variable "mode" {
     global = optional(bool, false)
     replicated = optional(object({
       replicas = number
-    }), { replicas = 1 })
+    }), { replicas = 3 })
   })
   validation {
     condition     = var.mode.replicated.replicas > 0
@@ -339,7 +304,6 @@ variable "healthcheck" {
   nullable    = true
   default     = null
 }
-
 
 ################################################################################
 # Certbot
