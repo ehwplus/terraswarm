@@ -274,15 +274,21 @@ variable "ports" {
     published_port = optional(number),
   }))
   validation {
-    condition = can(length(var.ports) == 0 || (length(var.ports) > 0 && alltrue([
-      for port in var.ports : port.protocol == null || regex("^(tcp|udp|sctp)$", port.protocol)
-    ])))
+    condition = can(
+      length(var.ports) == 0 ||
+      alltrue(
+        flatten([for port in var.ports : port.protocol == null || regex("^(tcp|udp|sctp)$", port.protocol)])
+      )
+    )
     error_message = "Invalid ports.[].protocol input, must be one of: 'tcp', 'udp', 'sctp'."
   }
   validation {
-    condition = can(length(var.ports) == 0 || (length(var.ports) > 0 && alltrue([
-      for port in var.ports : port.publish_mode == null || regex("^(ingress|host)$", port.publish_mode)
-    ])))
+    condition = can(
+      length(var.ports) == 0 ||
+      alltrue(
+        flatten([for port in var.ports : port.publish_mode == null || regex("^(ingress|host)$", port.publish_mode)])
+      )
+    )
     error_message = "Invalid ports.[].publish_mode input, must be one of: 'ingress', 'host'."
   }
   description = <<EOT
