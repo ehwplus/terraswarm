@@ -198,15 +198,15 @@ variable "restart_policy" {
     window       = optional(string)
   })
   validation {
-    condition     = can(regex("^(none|on-failure|any)$", var.restart_policy.condition))
+    condition     = var.restart_policy == null || can(contains(["none", "on-failure", "any"], var.restart_policy.condition))
     error_message = "Invalid input, options: 'none', 'on-failure', 'any'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.restart_policy.delay))
+    condition     = can(regex("^([0-9]+s)$", var.restart_policy.delay)) # var.restart_policy == null || var.restart_policy.delay == null || 
     error_message = "Invalid delay input, must comply with regex '^([0-9]+s)$'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.restart_policy.window))
+    condition     = can(regex("^([0-9]+s)$", var.restart_policy.window)) # var.restart_policy == null || var.restart_policy.window == null || 
     error_message = "Invalid window input, must comply with regex '^([0-9]+s)$'."
   }
   description = <<EOT
@@ -277,7 +277,7 @@ variable "ports" {
     condition = can(
       length(var.ports) == 0 ||
       alltrue(
-        flatten([for port in var.ports : port.protocol == null || regex("^(tcp|udp|sctp)$", port.protocol)])
+        flatten([for _, port in var.ports : port.protocol == null || contains(["tcp", "udp", "sctp"], port.protocol)])
       )
     )
     error_message = "Invalid ports.[].protocol input, must be one of: 'tcp', 'udp', 'sctp'."
@@ -286,7 +286,7 @@ variable "ports" {
     condition = can(
       length(var.ports) == 0 ||
       alltrue(
-        flatten([for port in var.ports : port.publish_mode == null || regex("^(ingress|host)$", port.publish_mode)])
+        flatten([for _, port in var.ports : port.publish_mode == null || contains(["ingress", "host"], port.publish_mode)])
       )
     )
     error_message = "Invalid ports.[].publish_mode input, must be one of: 'ingress', 'host'."
@@ -302,6 +302,7 @@ variable "ports" {
       published_port = The port on the swarm hosts.
     }]
   EOT
+  nullable    = false
   default     = []
 }
 
