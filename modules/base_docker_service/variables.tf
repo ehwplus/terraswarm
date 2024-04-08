@@ -53,6 +53,12 @@ variable "secrets" {
     secret_name = optional(string, null)
     secret_data = string
   }))
+  validation {
+    condition = can(alltrue([
+      for secret in var.secrets : secret.file_mode == null || regex("^(0?[0-7]{3})$", secret.file_mode)
+    ]))
+    error_message = "Invalid secrets.[].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
+  }
   description = "(Optional) The secrets to create with and add to the docker container. Creates docker secrets from non-terraform-resources."
   default     = []
 }
@@ -193,7 +199,7 @@ variable "restart_policy" {
   })
   validation {
     condition     = can(regex("^(none|on-failure|any)$", var.restart_policy.condition))
-    error_message = "Invalid input, options: \"none\", \"on-failure\", \"any\"."
+    error_message = "Invalid input, options: 'none', 'on-failure', 'any'."
   }
   validation {
     condition     = can(regex("^([0-9]+s)$", var.restart_policy.delay))
@@ -236,13 +242,14 @@ variable "mode" {
     global = optional(bool, false)
     replicated = optional(object({
       replicas = number
-    }), { replicas = 1 })
+    }), { replicas = 3 })
   })
   validation {
-    condition     = var.mode.replicated.replicas > 0
-    error_message = "Replicas must be greather than zero"
+    condition     = can(var.mode.global || (!var.mode.global && var.mode.replicated.replicas > 0))
+    error_message = "Mode must be either 'global' or'replicated' with replicas greater than zero."
   }
   description = <<EOT
+    (Optional) The service mode. Defaults to 'replicated' with replicas set to 1.
     type = {
       global = The global service mode. Defaults to 'false'.
       replicated = {
@@ -267,18 +274,20 @@ variable "ports" {
     published_port = optional(number),
   }))
   validation {
-    condition = can(alltrue([
-      for port in var.ports : regex("^(tcp|udp|sctp)$", port.protocol)
-    ]))
-    error_message = "Invalid ports.[].protocol input, must be one of: \"tcp\", \"udp\", \"sctp\"."
+    condition = can(length(var.ports) == 0 || (length(var.ports) > 0 && alltrue([
+      for port in var.ports : port.protocol == null || regex("^(tcp|udp|sctp)$", port.protocol)
+    ])))
+    error_message = "Invalid ports.[].protocol input, must be one of: 'tcp', 'udp', 'sctp'."
   }
   validation {
-    condition = can(alltrue([
-      for port in var.ports : regex("^(ingress|host)$", port.publish_mode)
-    ]))
-    error_message = "Invalid ports.[].publish_mode input, must be one of: \"ingress\", \"host\"."
+    condition = can(length(var.ports) == 0 || (length(var.ports) > 0 && alltrue([
+      for port in var.ports : port.publish_mode == null || regex("^(ingress|host)$", port.publish_mode)
+    ])))
+    error_message = "Invalid ports.[].publish_mode input, must be one of: 'ingress', 'host'."
   }
   description = <<EOT
+    (Optional) The ports to expose on the swarm for the service.
+
     ports = [{
       target_port    = The port inside the container.
       name           = A random name for the port.

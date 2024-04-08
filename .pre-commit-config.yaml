@@ -9,6 +9,7 @@ repos:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
       - id: terraform_validate
         args:
+          - --tf-init-args=-upgrade
           - --hook-config=--retry-once-with-cleanup=true # Boolean. true or false
       - id: terraform_fmt
       # - id: terraform_tfsec # deprecated

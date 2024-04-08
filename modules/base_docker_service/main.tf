@@ -253,8 +253,8 @@ resource "docker_service" "this" {
   }
 
   lifecycle {
-    ignore_changes = [name]
-    # create_before_destroy = false
+    ignore_changes        = [name]
+    create_before_destroy = false
   }
-  # depends_on = [docker_config.this, docker_secret.this]
+  depends_on = [docker_config.this, docker_secret.this]
 }
