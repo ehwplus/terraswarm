@@ -107,9 +107,9 @@ variable "configs" {
     config_data = string
   }))
   validation {
-    condition = can(alltrue([
-      for config in var.configs : config.file_mode == null || regex("^(0?[0-7]{3})$", config.file_mode)
-    ]))
+    condition = alltrue([
+      for _, config in var.configs : config.file_mode == null || can(regex("^(0?[0-7]{3})$", config.file_mode))
+    ])
     error_message = "Invalid configs.[].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
   }
   description = <<EOT
