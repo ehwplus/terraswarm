@@ -4,6 +4,9 @@ locals {
   image     = coalesce(var.custom_image, "grafana/tempo")
   image_tag = coalesce(var.image_tag, "2.3.1")
 
+  # FIXME tempo default http port; conflicts with config changes
+  tempo_internal_port = 3200
+
   configs = var.tempo_config == null ? [] : [
     { config_data = var.tempo_config
       file_name   = local.this_config_file_name
@@ -16,7 +19,7 @@ locals {
       name           = "http"
       protocol       = "tcp"
       target_port    = var.tempo_service_port
-      published_port = 3200 # FIXME tempo default http port; conflicts with config changes
+      published_port = local.tempo_internal_port
     }
   ]
 
@@ -26,7 +29,7 @@ locals {
   #
   # So in accordance with https://github.com/grafana/tempo/blob/main/cmd/tempo/Dockerfile
   # we have to include the entrypoint from the Dockerfile in the service command array.
-  command = flatten(["/tempo", var.tempo_config == null ? null : "-config.file=${local.this_config_file_name}"])
+  command = compact(flatten(["/tempo", var.tempo_config == null ? null : "-config.file=${local.this_config_file_name}", var.args]))
 
   this_config_file_name = "/etc/tempo.yml"
 }
@@ -34,15 +37,13 @@ locals {
 module "tempo_service" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
-  name      = local.name
-  namespace = local.namespace
-  image     = local.image
-  image_tag = local.image_tag
-  command   = local.command
-  configs   = local.configs
-  ports     = local.ports
-
-  args            = var.args
+  name            = local.name
+  namespace       = local.namespace
+  image           = local.image
+  image_tag       = local.image_tag
+  command         = local.command
+  configs         = local.configs
+  ports           = local.ports
   auth            = var.auth # container registry auth for private traefik images
   constraints     = var.constraints
   env             = var.env
