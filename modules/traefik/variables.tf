@@ -4,7 +4,7 @@
 
 variable "name" {
   type        = string
-  description = "The traefik service name. This name will also be used as a network alias for all attached networks."
+  description = "The service name which must not be longer than 63 characters. This name will also be used as a network alias for all attached networks."
   nullable    = false
 }
 
@@ -16,12 +16,13 @@ variable "namespace" {
 
 variable "custom_image" {
   type        = string
-  description = "A custom docker image name excluding the image tag. Make sure to specify the auth variable as well if the custom image is within a private registry."
+  description = "The docker image name excluding the image tag"
 }
 
 variable "image_tag" {
   type        = string
   description = "(Optional) The image tag of the docker image. Defaults to: latest"
+  nullable    = false
   default     = "latest"
 }
 
@@ -47,7 +48,14 @@ variable "secrets" {
     secret_name = optional(string, null)
     secret_data = string
   }))
-  description = "(Optional) The secrets to create with and add to the docker container"
+  validation {
+    condition = alltrue([
+      for secret in var.secrets : secret.file_mode == null || can(regex("^(0?[0-7]{3})$", secret.file_mode))
+    ])
+    error_message = "Invalid secrets.[].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
+  }
+  description = "(Optional) The secrets to create with and add to the docker container. Creates docker secrets from non-terraform-resources."
+  nullable    = false
   default     = []
 }
 
@@ -62,12 +70,14 @@ variable "secret_map" {
     secret_data = string
   }))
   validation {
-    condition = can(alltrue([
-      for key in var.secret_map : var.secret_map[key].file_mode == null || regex("^(0?[0-7]{3})$", var.secret_map[key].file_mode)
-    ]))
-    error_message = "Invalid var.secret_map[key].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
+    condition = alltrue([
+      for key in var.secret_map : var.secret_map[key].file_mode == null || can(regex("^(0?[0-7]{3})$", var.secret_map[key].file_mode))
+    ])
+    error_message = "Invalid secret_map.[key].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
   }
   description = <<EOT
+    (Optional) Similar to the secrets variable but allows for docker secret creation from terraform resources.
+    
     secret_map = {
       key = {
         file_name   = Represents the final filename in the filesystem.
@@ -76,10 +86,10 @@ variable "secret_map" {
         file_mode   = Represents represents the FileMode of the file. Defaults to '0o444'.
         file_uid    = Represents the file UID. Defaults to '0'.
         secret_name = Name of the secret that this references, but this is just provided for lookup/display purposes. The config in the reference will be identified by its ID.
-
       }
     }
   EOT
+  nullable    = false
   default     = {}
 }
 
@@ -95,6 +105,8 @@ variable "mounts" {
     volume_options = optional(object({ driver_name = optional(string), driver_options = optional(map(string)), labels = optional(map(string)), no_copy = optional(bool) }), {})
   }))
   description = <<EOT
+    (Optional) Mounts of this docker service.
+
     mounts = [{
       target        = Container path
       type          = The mount type
@@ -150,24 +162,26 @@ variable "reservation" {
 
 variable "restart_policy" {
   type = object({
-    condition    = optional(string)
-    delay        = optional(string)
-    max_attempts = optional(number)
-    window       = optional(string)
+    condition    = optional(string, "any")
+    delay        = optional(string, "5s")
+    max_attempts = optional(number, 0)
+    window       = optional(string, "5s")
   })
   validation {
-    condition     = can(regex("^(none|on-failure|any)$", var.restart_policy.condition))
-    error_message = "Invalid input, options: \"none\", \"on-failure\", \"any\"."
+    condition     = var.restart_policy == null || contains(["none", "on-failure", "any"], var.restart_policy.condition)
+    error_message = "Invalid input, options: 'none', 'on-failure', 'any'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.restart_policy.delay))
-    error_message = "Invalid delay input, must comply with regex '^([0-9]+s)$'."
+    condition     = var.restart_policy == null || var.restart_policy.delay == null || can(regex("^([0-9]+ms|s|m|h)$", var.restart_policy.delay))
+    error_message = "Invalid delay input, must comply with regex '^([0-9]+ms|s|m|h)$'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.restart_policy.window))
-    error_message = "Invalid window input, must comply with regex '^([0-9]+s)$'."
+    condition     = var.restart_policy == null || var.restart_policy.window == null || can(regex("^([0-9]+ms|s|m|h)$", var.restart_policy.window))
+    error_message = "Invalid window input, must comply with regex '^([0-9]+ms|s|m|h)$'."
   }
   description = <<EOT
+    (Optional) Restart policy for containers.
+  
     restart_policy = {
       condition    = Condition for restart; possible options are "none" which does not automatically restart, "on-failure" restarts on non-zero exit, "any" (default) restarts regardless of exit status.
       delay        = Delay between restart attempts (default is 5s) (ms|s|m|h).
@@ -175,6 +189,7 @@ variable "restart_policy" {
       window       = The time window used to evaluate the restart policy (default value is 5s, 0 means unbounded) (ms|s|m|h).
     }
   EOT
+  nullable    = true
   default = {
     condition    = "any"
     delay        = "5s"
@@ -200,13 +215,14 @@ variable "mode" {
     global = optional(bool, false)
     replicated = optional(object({
       replicas = number
-    }), { replicas = 3 })
+    }), { replicas = 1 })
   })
   validation {
-    condition     = var.mode.replicated.replicas > 0
-    error_message = "Replicas must be greather than zero"
+    condition     = var.mode.global || (!var.mode.global && var.mode.replicated.replicas > 0)
+    error_message = "Mode must be either 'global' or'replicated' with replicas greater than zero."
   }
   description = <<EOT
+    (Optional) The service mode. Defaults to 'replicated' with replicas set to 1.
     type = {
       global = The global service mode. Defaults to 'false'.
       replicated = {
@@ -231,18 +247,20 @@ variable "ports" {
     published_port = optional(number),
   }))
   validation {
-    condition = can(alltrue([
-      for port in var.ports : regex("^(tcp|udp|sctp)$", port.protocol)
-    ]))
-    error_message = "Invalid port.[].protocol input, must be one of: \"tcp\", \"udp\", \"sctp\"."
+    condition = length(var.ports) == 0 || alltrue(
+      flatten([for _, port in var.ports : port.protocol == null || contains(["tcp", "udp", "sctp"], port.protocol)])
+    )
+    error_message = "Invalid ports.[].protocol input, must be one of: 'tcp', 'udp', 'sctp'."
   }
   validation {
-    condition = can(alltrue([
-      for port in var.ports : regex("^(ingress|host)$", port.publish_mode)
-    ]))
-    error_message = "Invalid port.[].publish_mode input, must be one of: \"ingress\", \"host\"."
+    condition = length(var.ports) == 0 || alltrue(
+      flatten([for _, port in var.ports : port.publish_mode == null || contains(["ingress", "host"], port.publish_mode)])
+    )
+    error_message = "Invalid ports.[].publish_mode input, must be one of: 'ingress', 'host'."
   }
   description = <<EOT
+    (Optional) The ports to expose on the swarm for the service.
+
     ports = [{
       target_port    = The port inside the container.
       name           = A random name for the port.
@@ -251,6 +269,7 @@ variable "ports" {
       published_port = The port on the swarm hosts.
     }]
   EOT
+  nullable    = false
   default     = []
 }
 
@@ -261,6 +280,8 @@ variable "auth" {
     password       = string
   })
   description = <<EOT
+    (Optional) The authentication for a private docker registry.
+
     auth = {
       server_address = The address of the server for the authentication against a private docker registry.
       username       = The password.
@@ -281,16 +302,16 @@ variable "healthcheck" {
     start_period = optional(string, "0s")
   })
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.healthcheck.interval))
-    error_message = "Invalid interval input, must comply with regex '^([0-9]+s)$'."
+    condition     = var.healthcheck == null || can(regex("^([0-9]+ms|s|m|h)$", var.healthcheck.interval))
+    error_message = "Invalid interval input, must comply with regex '^([0-9]+ms|s|m|h)$'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.healthcheck.timeout))
-    error_message = "Invalid timeout input, must comply with regex '^([0-9]+s)$'."
+    condition     = var.healthcheck == null || can(regex("^([0-9]+ms|s|m|h)$", var.healthcheck.timeout))
+    error_message = "Invalid timeout input, must comply with regex '^([0-9]+ms|s|m|h)$'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.healthcheck.start_period))
-    error_message = "Invalid start_period input, must comply with regex '^([0-9]+s)$'."
+    condition     = var.healthcheck == null || can(regex("^([0-9]+ms|s|m|h)$", var.healthcheck.start_period))
+    error_message = "Invalid start_period input, must comply with regex '^([0-9]+ms|s|m|h)$'."
   }
   description = <<EOT
     healthcheck = {
@@ -304,7 +325,6 @@ variable "healthcheck" {
   nullable    = true
   default     = null
 }
-
 
 ################################################################################
 # Traefik
