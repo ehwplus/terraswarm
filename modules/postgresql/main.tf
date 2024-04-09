@@ -81,7 +81,7 @@ module "postgresql_docker_volume" {
   namespace = local.namespace
 }
 
-module "this" {
+module "postgresql_docker_service" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
   name        = local.name
