@@ -41,3 +41,6 @@ terraform.rc
 
 .terraform.lock.hcl
 .DS_Store
+
+# omit any tftpl files
+**/*.tftpl
