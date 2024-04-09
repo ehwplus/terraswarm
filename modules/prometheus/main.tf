@@ -6,9 +6,9 @@ locals {
 
   this_config_file_name    = "/etc/prometheus/prometheus.yml"
   volume_mount_path        = "/prometheus"
-  prometheus_internal_port = 9090
+  prometheus_internal_port = 9090 # can be changed in the config and can lead to issues
 
-  configs = [
+  configs = var.prometheus_config == null ? [] : [
     {
       config_data = var.prometheus_config
       file_name   = local.this_config_file_name
@@ -24,7 +24,6 @@ locals {
       start_period = "40s"
     }
   )
-
 
   mounts = [
     {
@@ -53,14 +52,14 @@ locals {
   #
   # So in accordance with https://github.com/prometheus/prometheus/blob/main/Dockerfile
   # we have to include the entrypoint from the Dockerfile in the service command array.
-  command = flatten([
+  command = compact(flatten([
     "/bin/prometheus",
-    "--config.file", local.this_config_file_name,
+    var.prometheus_config == null ? null : "--config.file", local.this_config_file_name,
     "--storage.tsdb.path", local.volume_mount_path,
     "--web.console.libraries=/usr/share/prometheus/console_libraries",
     "--web.console.templates=/usr/share/prometheus/consoles",
     var.args
-  ])
+  ]))
 }
 
 module "prometheus_docker_volume" {
@@ -94,4 +93,6 @@ module "prometheus_service" {
   restart_policy  = var.restart_policy
   secret_map      = var.secret_map
   secrets         = var.secrets
+
+  depends_on = [module.prometheus_docker_volume]
 }
