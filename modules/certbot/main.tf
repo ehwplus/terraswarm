@@ -1,24 +1,28 @@
 
 locals {
-  mounts = toset(concat([
+  mounts = setunion([
     {
-      target    = "/etc/letsencrypt"
-      source    = module.certbot_docker_volume.this.name
-      type      = "volume"
-      read_only = false
+      target         = "/etc/letsencrypt"
+      source         = module.certbot_docker_volume.this.name
+      type           = "volume"
+      read_only      = false
+      tmpfs_options  = null
+      volume_options = null
     },
     {
-      target    = "/var/lib/letsencrypt"
-      source    = module.certbot_docker_volume.this.name
-      type      = "volume"
-      read_only = false
+      target         = "/var/lib/letsencrypt"
+      source         = module.certbot_docker_volume.this.name
+      type           = "volume"
+      read_only      = false
+      tmpfs_options  = null
+      volume_options = null
     }
     ],
-    tolist(var.mounts)
-  ))
+    var.mounts
+  )
 
   ports = flatten(concat(
-    var.standalone ? [
+    var.certbot_standalone ? [
       {
         target_port  = 80,
         name         = "http",
