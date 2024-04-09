@@ -9,13 +9,15 @@ locals {
   #
   default_mounts = [
     {
-      target    = "/etc/localtime"
-      source    = "/etc/localtime"
-      type      = "bind"
-      read_only = true
+      target         = "/etc/localtime"
+      source         = "/etc/localtime"
+      type           = "bind"
+      read_only      = true
+      tmpfs_options  = null
+      volume_options = null
     }
   ]
-  all_mounts = toset(concat(tolist(local.default_mounts), tolist(var.mounts)))
+  all_mounts = setunion(local.default_mounts, var.mounts)
 
   #
   # local labels
