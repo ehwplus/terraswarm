@@ -25,12 +25,6 @@ variable "image_tag" {
   default     = "latest"
 }
 
-variable "command" {
-  type        = list(string)
-  description = "(Optional) The command/entrypoint to be run in the image. According to the docker cli the override of the entrypoint is also passed to the command property and there is no entrypoint attribute in the ContainerSpec of the service."
-  default     = null
-}
-
 variable "args" {
   type        = list(string)
   description = "(Optional) The arguments to pass to the docker image"
@@ -53,6 +47,12 @@ variable "secrets" {
     secret_name = optional(string, null)
     secret_data = string
   }))
+  validation {
+    condition = can(alltrue([
+      for secret in var.secrets : secret.file_mode == null || regex("^(0?[0-7]{3})$", secret.file_mode)
+    ]))
+    error_message = "Invalid secrets.[].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
+  }
   description = "(Optional) The secrets to create with and add to the docker container. Creates docker secrets from non-terraform-resources."
   default     = []
 }
@@ -88,35 +88,6 @@ variable "secret_map" {
     }
   EOT
   default     = {}
-}
-
-variable "configs" {
-  type = set(object({
-    file_name = string
-    # config_id   = string # config will be created and we take that resource id
-    file_gid    = optional(string)
-    file_mode   = optional(number, 0444)
-    file_uid    = optional(string)
-    config_name = optional(string, null)
-    config_data = string
-  }))
-  validation {
-    condition = can(alltrue([
-      for config in var.configs : config.file_mode == null || regex("^(0?[0-7]{3})$", config.file_mode)
-    ]))
-    error_message = "Invalid configs.[].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
-  }
-  description = <<EOT
-    configs = [{
-      config_id   = ID of the specific config that we're referencing
-      file_name   = Represents the final filename in the filesystem
-      config_name = Name of the config that this references, but this is just provided for lookup/display purposes. The config in the reference will be identified by its ID
-      file_gid    = Represents the file GID. Defaults to '0'.
-      file_mode   = Represents represents the FileMode of the file. Defaults to '0o444'.
-      file_uid    = Represents the file UID. Defaults to '0'.
-    }]
-  EOT
-  default     = []
 }
 
 variable "mounts" {
@@ -192,15 +163,15 @@ variable "restart_policy" {
     window       = optional(string)
   })
   validation {
-    condition     = can(regex("^(none|on-failure|any)$", var.restart_policy.condition))
-    error_message = "Invalid input, options: \"none\", \"on-failure\", \"any\"."
+    condition     = var.restart_policy == null || can(contains(["none", "on-failure", "any"], var.restart_policy.condition))
+    error_message = "Invalid input, options: 'none', 'on-failure', 'any'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.restart_policy.delay))
+    condition     = can(regex("^([0-9]+s)$", var.restart_policy.delay)) # var.restart_policy == null || var.restart_policy.delay == null || 
     error_message = "Invalid delay input, must comply with regex '^([0-9]+s)$'."
   }
   validation {
-    condition     = can(regex("^([0-9]+s)$", var.restart_policy.window))
+    condition     = can(regex("^([0-9]+s)$", var.restart_policy.window)) # var.restart_policy == null || var.restart_policy.window == null || 
     error_message = "Invalid window input, must comply with regex '^([0-9]+s)$'."
   }
   description = <<EOT
@@ -236,13 +207,14 @@ variable "mode" {
     global = optional(bool, false)
     replicated = optional(object({
       replicas = number
-    }), { replicas = 1 })
+    }), { replicas = 3 })
   })
   validation {
-    condition     = var.mode.replicated.replicas > 0
-    error_message = "Replicas must be greather than zero"
+    condition     = can(var.mode == null || var.mode.global || (!var.mode.global && var.mode.replicated.replicas > 0))
+    error_message = "Mode must be either 'global' or 'replicated' with replicas greater than zero."
   }
   description = <<EOT
+    (Optional) The service mode. Defaults to 'replicated' with replicas set to 1.
     type = {
       global = The global service mode. Defaults to 'false'.
       replicated = {
@@ -250,12 +222,7 @@ variable "mode" {
       }
     }
   EOT
-  default = {
-    global = false,
-    replicated = {
-      replicas = 1
-    }
-  }
+  default     = { global = true } # use otel as a node log agent as well
 }
 
 variable "ports" {
@@ -267,18 +234,26 @@ variable "ports" {
     published_port = optional(number),
   }))
   validation {
-    condition = can(alltrue([
-      for port in var.ports : regex("^(tcp|udp|sctp)$", port.protocol)
-    ]))
-    error_message = "Invalid ports.[].protocol input, must be one of: \"tcp\", \"udp\", \"sctp\"."
+    condition = can(
+      length(var.ports) == 0 ||
+      alltrue(
+        flatten([for _, port in var.ports : port.protocol == null || contains(["tcp", "udp", "sctp"], port.protocol)])
+      )
+    )
+    error_message = "Invalid ports.[].protocol input, must be one of: 'tcp', 'udp', 'sctp'."
   }
   validation {
-    condition = can(alltrue([
-      for port in var.ports : regex("^(ingress|host)$", port.publish_mode)
-    ]))
-    error_message = "Invalid ports.[].publish_mode input, must be one of: \"ingress\", \"host\"."
+    condition = can(
+      length(var.ports) == 0 ||
+      alltrue(
+        flatten([for _, port in var.ports : port.publish_mode == null || contains(["ingress", "host"], port.publish_mode)])
+      )
+    )
+    error_message = "Invalid ports.[].publish_mode input, must be one of: 'ingress', 'host'."
   }
   description = <<EOT
+    (Optional) The ports to expose on the swarm for the service.
+
     ports = [{
       target_port    = The port inside the container.
       name           = A random name for the port.
@@ -345,13 +320,13 @@ variable "healthcheck" {
 # OpenTelemtry Collector
 ################################################################################
 
-variable "config" {
+variable "opentelemetry_config" {
   type        = string
   description = "The static config file for OpenTelemtry Collector"
   default     = null
 }
 
-variable "service_port" {
+variable "opentelemetry_service_port" {
   type        = number
   description = "The internal and external service port for OpenTelemetry receiver"
   nullable    = false
