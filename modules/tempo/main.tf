@@ -8,7 +8,8 @@ locals {
   tempo_internal_port = 3200
 
   configs = var.tempo_config == null ? [] : [
-    { config_data = var.tempo_config
+    {
+      config_data = var.tempo_config
       file_name   = local.this_config_file_name
       file_mode   = 0400
     }
