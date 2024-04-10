@@ -84,17 +84,15 @@ module "postgresql_docker_volume" {
 module "postgresql_docker_service" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
-  name        = local.name
-  namespace   = local.namespace
-  image       = local.image
-  image_tag   = local.image_tag
-  mounts      = local.mounts
-  env         = local.env
-  secrets     = local.secrets
-  ports       = local.ports
-  healthcheck = local.healthcheck
-
-
+  name            = local.name
+  namespace       = local.namespace
+  image           = local.image
+  image_tag       = local.image_tag
+  mounts          = local.mounts
+  env             = local.env
+  secrets         = local.secrets
+  ports           = local.ports
+  healthcheck     = local.healthcheck
   args            = var.args
   auth            = var.auth # container registry auth for private traefik images
   command         = var.postgresql_config == null ? null : ["postgres", "-c", "'config_file=${local.this_postgresql_config_file}'"]
