@@ -1,6 +1,11 @@
-output "service" {
+output "postgresql_service" {
   value       = module.postgresql_docker_service.this
   description = "The PostgreSQL docker service."
+}
+
+output "postgresql_secret" {
+  value       = module.postgresql_docker_service.secrets.this
+  description = "The PostgreSQL docker secrets."
 }
 
 output "user" {
