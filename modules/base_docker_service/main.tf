@@ -9,7 +9,7 @@ locals {
   #
   # local mounts
   #
-  default_mounts = [
+  default_mounts = toset([
     {
       target         = "/etc/localtime"
       source         = "/etc/localtime"
@@ -18,7 +18,7 @@ locals {
       tmpfs_options  = null
       volume_options = null
     }
-  ]
+  ])
   all_mounts = setunion(local.default_mounts, var.mounts)
 
   #
