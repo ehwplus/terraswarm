@@ -48,19 +48,17 @@ locals {
     var.env
   )
 
-  minio_mounts = setunion(
-    toset([
-      {
-        target         = local.minio_data_dir
-        source         = module.minio_docker_volume.this.name
-        type           = "volume"
-        read_only      = false
-        tmpfs_options  = null
-        volume_options = null
-      }
-    ]),
-    var.mounts
-  )
+  minio_data_mount = toset([
+    {
+      target         = local.minio_data_dir
+      source         = module.minio_docker_volume.this.name
+      type           = "volume"
+      read_only      = false
+      tmpfs_options  = null
+      volume_options = null
+    }
+  ])
+  minio_mounts = length(var.mounts) == 0 ? local.minio_data_mount : setunion(local.minio_data_mount, var.mounts)
 
   minio_healthcheck = coalesce(var.healthcheck,
     {
