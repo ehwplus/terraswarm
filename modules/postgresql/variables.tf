@@ -174,12 +174,12 @@ variable "restart_policy" {
     error_message = "Invalid input, options: 'none', 'on-failure', 'any'."
   }
   validation {
-    condition     = var.restart_policy == null || var.restart_policy.delay == null || can(regex("^([0-9]+ms|s|m|h)$", var.restart_policy.delay))
-    error_message = "Invalid delay input, must comply with regex '^([0-9]+ms|s|m|h)$'."
+    condition     = var.restart_policy == null || var.restart_policy.delay == null || can(regex("^([0-9]+(?:ms|s|m|h))$$", var.restart_policy.delay))
+    error_message = "Invalid delay input, must comply with regex '^([0-9]+(?:ms|s|m|h))$$'."
   }
   validation {
-    condition     = var.restart_policy == null || var.restart_policy.window == null || can(regex("^([0-9]+ms|s|m|h)$", var.restart_policy.window))
-    error_message = "Invalid window input, must comply with regex '^([0-9]+ms|s|m|h)$'."
+    condition     = var.restart_policy == null || var.restart_policy.window == null || can(regex("^([0-9]+(?:ms|s|m|h))$$", var.restart_policy.window))
+    error_message = "Invalid window input, must comply with regex '^([0-9]+(?:ms|s|m|h))$$'."
   }
   description = <<EOT
     (Optional) Restart policy for containers.
@@ -269,16 +269,16 @@ variable "healthcheck" {
     start_period = optional(string, "0s")
   })
   validation {
-    condition     = var.healthcheck == null || can(regex("^([0-9]+ms|s|m|h)$", var.healthcheck.interval))
-    error_message = "Invalid interval input, must comply with regex '^([0-9]+ms|s|m|h)$'."
+    condition     = var.healthcheck == null || can(regex("^([0-9]+(?:ms|s|m|h))$$", var.healthcheck.interval))
+    error_message = "Invalid interval input, must comply with regex '^([0-9]+(?:ms|s|m|h))$$'."
   }
   validation {
-    condition     = var.healthcheck == null || can(regex("^([0-9]+ms|s|m|h)$", var.healthcheck.timeout))
-    error_message = "Invalid timeout input, must comply with regex '^([0-9]+ms|s|m|h)$'."
+    condition     = var.healthcheck == null || can(regex("^([0-9]+(?:ms|s|m|h))$$", var.healthcheck.timeout))
+    error_message = "Invalid timeout input, must comply with regex '^([0-9]+(?:ms|s|m|h))$$'."
   }
   validation {
-    condition     = var.healthcheck == null || can(regex("^([0-9]+ms|s|m|h)$", var.healthcheck.start_period))
-    error_message = "Invalid start_period input, must comply with regex '^([0-9]+ms|s|m|h)$'."
+    condition     = var.healthcheck == null || can(regex("^([0-9]+(?:ms|s|m|h))$$", var.healthcheck.start_period))
+    error_message = "Invalid start_period input, must comply with regex '^([0-9]+(?:ms|s|m|h))$$'."
   }
   description = <<EOT
     healthcheck = {
