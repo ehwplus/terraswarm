@@ -52,7 +52,7 @@ locals {
     var.ports
   ))
 
-  healthcheck = merge(var.healthcheck, { test = coalesce(var.healthcheck.test, ["traefik", "healthcheck", "--ping"]) })
+  healthcheck = merge({ test = ["traefik", "healthcheck", "--ping"] }, var.healthcheck)
 
   name      = coalesce(var.name, "traefik")
   namespace = coalesce(var.namespace, "gateway")
