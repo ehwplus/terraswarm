@@ -1,4 +1,4 @@
-output "postgresql_service" {
+output "this" {
   value       = module.postgresql_docker_service.this
   description = "The PostgreSQL docker service."
 }
