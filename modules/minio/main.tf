@@ -4,18 +4,16 @@ locals {
   image     = coalesce(var.custom_image, "minio/minio") # https://hub.docker.com/r/minio/minio
   image_tag = coalesce(var.image_tag, "RELEASE.2023-12-06T09-09-22Z-cpuv1")
 
-  secrets = setunion(
-    toset([
-      {
-        file_name   = "MINIO_ACCESS_KEY"
-        secret_data = resource.random_string.minio_access_key.result
-        }, {
-        file_name   = "MINIO_SECRET_KEY"
-        secret_data = resource.random_password.minio_secret_key.result
-      }
-    ]),
-    var.secrets
-  )
+  minio_credential_secrets = toset([
+    {
+      file_name   = "MINIO_ACCESS_KEY"
+      secret_data = nonsensitive(resource.random_string.minio_access_key.result)
+      }, {
+      file_name   = "MINIO_SECRET_KEY"
+      secret_data = nonsensitive(resource.random_password.minio_secret_key.result)
+    }
+  ])
+  secrets = length(var.secrets) == 0 ? local.minio_credential_secrets : setunion(local.minio_credential_secrets, var.secrets)
 
   secret_map = {
     for secret in local.secrets :
