@@ -266,7 +266,7 @@ variable "prometheus_config" {
   default     = null
 }
 
-variable "service_port" {
+variable "prometheus_service_port" {
   type        = number
   description = "The internal and external service port for Prometheus"
   nullable    = false

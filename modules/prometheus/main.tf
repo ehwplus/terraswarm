@@ -39,7 +39,7 @@ locals {
 
   ports = [
     {
-      target_port    = var.service_port,
+      target_port    = var.prometheus_service_port,
       name           = "api",
       protocol       = "tcp",
       publish_mode   = "ingress"
