@@ -144,5 +144,5 @@ module "minio_docker_service" {
   reservation     = var.reservation
   restart_policy  = var.restart_policy
 
-  depends_on = [random_string.minio_access_key, random_password.minio_secret_key, module.minio_docker_volume]
+  depends_on = [random_string.minio_access_key, random_password.minio_secret_key, module.minio_docker_volume, module.create_bucket]
 }
