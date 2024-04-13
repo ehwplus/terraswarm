@@ -4,7 +4,7 @@ output "postgresql_service" {
 }
 
 output "postgresql_secret" {
-  value       = module.postgresql_docker_service.secrets.this
+  value       = module.postgresql_docker_service.secrets
   description = "The PostgreSQL docker secrets."
 }
 
