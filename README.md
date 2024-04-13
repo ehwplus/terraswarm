@@ -6,6 +6,8 @@
 </p>
 
 <p align="center">
+  <a href="CONTRIBUTING.md">Contributing Guidelines</a>
+  ·
   <a href="CODE_OF_CONDUCT.md">Code of Conduct</a>
   ·
   <a href="https://github.com/ehwplus/terraswarm/issues">Submit an Issue</a>
