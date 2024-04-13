@@ -46,8 +46,8 @@ variable "env" {
 
 variable "secrets" {
   type = set(object({
-    file_name = string
-    # secret_id   = string # secret will be created and we take that resource id
+    file_name   = optional(string)
+    secret_id   = optional(string, null) # secret_id will be auto-generated if not provided; secrets with secret_id must exist beforehand
     file_gid    = optional(string, "0")
     file_mode   = optional(number, 0444)
     file_uid    = optional(string, "0")

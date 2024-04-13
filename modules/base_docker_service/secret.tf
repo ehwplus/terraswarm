@@ -12,6 +12,7 @@ resource "docker_secret" "this" {
       value = var.namespace
     }
   }
+
   dynamic "labels" {
     for_each = local.common_deployment_labels
     content {

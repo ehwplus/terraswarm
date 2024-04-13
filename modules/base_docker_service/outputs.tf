@@ -9,6 +9,6 @@ output "secrets" {
 }
 
 output "configs" {
-  value       = docker_config.this
+  value       = resource.docker_config.this
   description = "The configs created with and for this base docker service."
 }

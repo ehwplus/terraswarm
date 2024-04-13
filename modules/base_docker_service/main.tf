@@ -2,7 +2,9 @@ locals {
   # Create a map with statically defined keys
   # According to https://jeffbrown.tech/terraform-for-each-index/#Solutions_to_Terraform_for_each_Index_Issues
   config_map = { for idx, config in tolist(var.configs) : coalesce(config.config_name, idx) => config }
-  secret_map = merge(var.secret_map, { for _, secret in tolist(var.secrets) : secret.file_name => secret })
+  secret_map = merge(var.secret_map, { for _, secret in tolist(var.secrets) : secret.file_name => secret if secret.secret_id == null })
+  # TODO enable secret_id for secret_map at some point and merge maps of preexisting secrets
+  preexisting_secrets_map = { for _, secret in tolist(var.secrets) : secret.file_name => secret if secret.secret_id != null }
 
   #
   # local mounts
@@ -106,10 +108,10 @@ resource "docker_service" "this" {
       }
 
       dynamic "secrets" {
-        for_each = local.secret_map
+        for_each = merge(local.secret_map, local.preexisting_secrets_map)
         content {
-          secret_id   = docker_secret.this[secrets.key].id
-          secret_name = coalesce(secrets.value.secret_name, docker_secret.this[secrets.key].name, null)
+          secret_id   = coalesce(secrets.value.secret_id, docker_secret.this[secrets.key].id)
+          secret_name = coalesce(secrets.value.secret_name, docker_secret.this[secrets.key].name)
           file_name   = secrets.value.file_name
           file_uid    = secrets.value.file_uid
           file_gid    = secrets.value.file_gid
