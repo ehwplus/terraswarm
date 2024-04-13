@@ -73,7 +73,7 @@ variable "secret_map" {
   }))
   validation {
     condition = alltrue([
-      for key in var.secret_map : var.secret_map[key].file_mode == null || can(regex("^(0?[0-7]{3})$", var.secret_map[key].file_mode))
+      for _, secret in var.secret_map : secret.file_mode == null || can(regex("^(0?[0-7]{3})$", secret.file_mode))
     ])
     error_message = "Invalid secret_map.[key].file_mode input, must comply with regex '^(0?[0-7]{3})$'."
   }
