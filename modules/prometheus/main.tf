@@ -53,14 +53,16 @@ locals {
   #
   # So in accordance with https://github.com/prometheus/prometheus/blob/main/Dockerfile
   # we have to include the entrypoint from the Dockerfile in the service command array.
-  command = compact(concat([
-    "/bin/prometheus",
-    var.prometheus_config == null ? null : "--config.file", local.this_config_file_name,
-    "--storage.tsdb.path", local.volume_mount_path,
-    "--web.console.libraries=/usr/share/prometheus/console_libraries",
-    "--web.console.templates=/usr/share/prometheus/consoles"
+  command = compact(concat(
+    [
+      "/bin/prometheus",
+      var.prometheus_config == null ? null : "--config.file", local.this_config_file_name,
+      "--storage.tsdb.path", local.volume_mount_path,
+      "--web.console.libraries=/usr/share/prometheus/console_libraries",
+      "--web.console.templates=/usr/share/prometheus/consoles"
     ],
-  var.args))
+    var.args
+  ))
 }
 
 module "prometheus_docker_volume" {
