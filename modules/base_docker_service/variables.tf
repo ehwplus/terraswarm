@@ -139,7 +139,7 @@ variable "mounts" {
     read_only      = optional(bool, false)
     source         = optional(string)
     tmpfs_options  = optional(object({ mode = optional(number), size_bytes = optional(number) }), null)
-    volume_options = optional(object({ driver_name = optional(string), driver_options = optional(map(string)), labels = optional(map(string)), no_copy = optional(bool) }), {})
+    volume_options = optional(object({ driver_name = optional(string), driver_options = optional(map(string)), labels = optional(map(string)), no_copy = optional(bool) }), null)
   }))
   description = <<EOT
     (Optional) Mounts of this docker service.

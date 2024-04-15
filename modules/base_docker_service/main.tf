@@ -19,7 +19,7 @@ locals {
       volume_options = null
     }
   ]
-  all_mounts = length(var.mounts) == 0 ? local.default_mounts : toset(concat(local.default_mounts, tolist(var.mounts)))
+  all_mounts = concat(tolist(local.default_mounts), tolist(var.mounts))
 
   #
   # local labels
@@ -110,7 +110,7 @@ resource "docker_service" "this" {
       dynamic "secrets" {
         for_each = merge(local.secret_map, local.preexisting_secrets_map)
         content {
-          secret_id   = coalesce(secrets.value.secret_id, docker_secret.this[secrets.key].id)
+          secret_id   = coalesce(lookup(secrets.value, "secret_id", null), docker_secret.this[secrets.key].id)
           secret_name = coalesce(secrets.value.secret_name, docker_secret.this[secrets.key].name)
           file_name   = secrets.value.file_name
           file_uid    = secrets.value.file_uid
