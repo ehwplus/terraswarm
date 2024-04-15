@@ -19,7 +19,7 @@ locals {
 
   healthcheck = coalesce(
     var.healthcheck, {
-      test         = ["wget --no-verbose --tries=1 --spider http://localhost:${local.loki_internal_port}/ready || exit 1"]
+      test         = ["wget --no-verbose --tries=1 --spider http://${local.name}:${local.loki_internal_port}/ready || exit 1"]
       interval     = "10s"
       timeout      = "15s"
       retries      = 10
@@ -53,11 +53,13 @@ locals {
   #
   # So in accordance with https://github.com/grafana/loki/blob/main/cmd/loki/Dockerfile
   # we have to include the entrypoint from the Dockerfile in the service command array.
-  command = compact(flatten([
-    "/usr/bin/loki",
-    var.loki_config == null ? null : "-config.file=${local.this_config_file_name}",
+  command = compact(concat(
+    [
+      "/usr/bin/loki",
+      var.loki_config == null ? "" : "-config.file=${local.this_config_file_name}"
+    ],
     var.args
-  ]))
+  ))
 
 }
 
