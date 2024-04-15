@@ -161,7 +161,7 @@ resource "docker_service" "this" {
         for_each = var.healthcheck == null ? [] : [1]
         content {
           test         = var.healthcheck.test
-          interval     = var.healthcheck.internal
+          interval     = var.healthcheck.interval
           timeout      = var.healthcheck.timeout
           retries      = var.healthcheck.retries
           start_period = var.healthcheck.start_period
