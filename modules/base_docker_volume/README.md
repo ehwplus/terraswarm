@@ -5,6 +5,7 @@
 
 | Name | Version |
 |------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.2 |
 | <a name="requirement_docker"></a> [docker](#requirement\_docker) | 3.0.2 |
 
 ## Providers
@@ -27,7 +28,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_driver"></a> [driver](#input\_driver) | Driver type for the volume. Defaults to 'overlay2'. | `string` | `"overlay2"` | no |
+| <a name="input_driver"></a> [driver](#input\_driver) | Driver type for the volume. Defaults to 'local'. | `string` | `"local"` | no |
 | <a name="input_driver_options"></a> [driver\_options](#input\_driver\_options) | Options specific to the driver. | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The docker volume name | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The namespace of Docker Swarm | `string` | `null` | no |
