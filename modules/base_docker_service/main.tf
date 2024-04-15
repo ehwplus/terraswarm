@@ -158,7 +158,7 @@ resource "docker_service" "this" {
       stop_grace_period = "10s"
 
       dynamic "healthcheck" {
-        for_each = var.healthcheck != null ? [] : [1]
+        for_each = var.healthcheck == null ? [] : [1]
         content {
           test         = var.healthcheck.test
           interval     = var.healthcheck.internal
