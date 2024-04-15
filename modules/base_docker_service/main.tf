@@ -15,8 +15,8 @@ locals {
       source         = "/etc/localtime"
       type           = "bind"
       read_only      = true
-      tmpfs_options  = null
-      volume_options = null
+      tmpfs_options  = {}
+      volume_options = {}
     }
   ]
   all_mounts = concat(tolist(local.default_mounts), tolist(var.mounts))
