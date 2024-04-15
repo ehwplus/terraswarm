@@ -31,7 +31,8 @@ variable "image_tag" {
 variable "args" {
   type        = list(string)
   description = "(Optional) The arguments to pass to the docker image"
-  default     = null
+  nullable    = false
+  default     = []
 }
 
 variable "env" {
