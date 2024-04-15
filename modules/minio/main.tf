@@ -4,7 +4,7 @@ locals {
   image     = coalesce(var.custom_image, "minio/minio") # https://hub.docker.com/r/minio/minio
   image_tag = coalesce(var.image_tag, "RELEASE.2023-12-06T09-09-22Z-cpuv1")
 
-  minio_credential_secrets = [
+  minio_credential_secrets = tolist([
     {
       file_name   = "MINIO_ACCESS_KEY"
       secret_data = nonsensitive(resource.random_string.minio_access_key.result)
@@ -12,8 +12,8 @@ locals {
       file_name   = "MINIO_SECRET_KEY"
       secret_data = nonsensitive(resource.random_password.minio_secret_key.result)
     }
-  ]
-  secrets = length(var.secrets) == 0 ? local.minio_credential_secrets : toset(concat(local.minio_credential_secrets, tolist(var.secrets)))
+  ])
+  secrets = length(var.secrets) == 0 ? local.minio_credential_secrets : concat(local.minio_credential_secrets, tolist(var.secrets))
 
   secret_map = {
     for secret in local.secrets :
@@ -58,7 +58,7 @@ locals {
       volume_options = null
     }
   ]
-  minio_mounts = length(var.mounts) == 0 ? local.minio_data_mount : toset(concat(local.minio_data_mount, tolist(var.mounts)))
+  minio_mounts = length(var.mounts) == 0 ? local.minio_data_mount : concat(tolist(local.minio_data_mount), tolist(var.mounts))
 
   minio_healthcheck = coalesce(var.healthcheck,
     {
@@ -89,7 +89,7 @@ resource "random_password" "minio_secret_key" {
   override_special = "!#$%&*()-_=+:?"
 }
 
-# FIXME secrets for init task
+# FIXME secrets for init task outside of command
 module "create_bucket" {
   source    = "../base_docker_service"
   name      = "create_bucket"
@@ -128,8 +128,7 @@ module "minio_docker_service" {
   healthcheck = local.minio_healthcheck
   secret_map  = local.secret_map
 
-  # FIXME parameterize ports and the dir from volume target
-  args            = coalesce(var.args, ["server", "--address", ":${local.minio_api_port}", "--console-address", ":${local.minio_ui_port}", local.minio_data_dir])
+  args            = concat(["server", "--address", ":${local.minio_api_port}", "--console-address", ":${local.minio_ui_port}", local.minio_data_dir], var.args)
   auth            = var.auth # container registry auth for private minio images
   constraints     = var.constraints
   labels          = var.labels
