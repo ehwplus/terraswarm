@@ -13,7 +13,7 @@ locals {
       secret_data = nonsensitive(resource.random_password.minio_secret_key.result)
     }
   ]
-  secrets = length(var.secrets) == 0 ? local.minio_credential_secrets : toset(concat(local.minio_credential_secrets, var.secrets))
+  secrets = length(var.secrets) == 0 ? local.minio_credential_secrets : toset(concat(local.minio_credential_secrets, tolist(var.secrets)))
 
   secret_map = {
     for secret in local.secrets :
@@ -58,7 +58,7 @@ locals {
       volume_options = null
     }
   ]
-  minio_mounts = length(var.mounts) == 0 ? local.minio_data_mount : toset(concat(local.minio_data_mount, var.mounts))
+  minio_mounts = length(var.mounts) == 0 ? local.minio_data_mount : toset(concat(local.minio_data_mount, tolist(var.mounts)))
 
   minio_healthcheck = coalesce(var.healthcheck,
     {
