@@ -9,7 +9,7 @@ locals {
   #
   # local mounts
   #
-  default_mounts = toset([
+  default_mounts = [
     {
       target         = "/etc/localtime"
       source         = "/etc/localtime"
@@ -18,7 +18,7 @@ locals {
       tmpfs_options  = null
       volume_options = null
     }
-  ])
+  ]
   all_mounts = var.mounts == null ? local.default_mounts : toset(concat(local.default_mounts, var.mounts))
 
   #
