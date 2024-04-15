@@ -4,7 +4,7 @@ locals {
   image     = coalesce(var.custom_image, "minio/minio") # https://hub.docker.com/r/minio/minio
   image_tag = coalesce(var.image_tag, "RELEASE.2023-12-06T09-09-22Z-cpuv1")
 
-  minio_credential_secrets = toset([
+  minio_credential_secrets = [
     {
       file_name   = "MINIO_ACCESS_KEY"
       secret_data = nonsensitive(resource.random_string.minio_access_key.result)
@@ -12,7 +12,7 @@ locals {
       file_name   = "MINIO_SECRET_KEY"
       secret_data = nonsensitive(resource.random_password.minio_secret_key.result)
     }
-  ])
+  ]
   secrets = length(var.secrets) == 0 ? local.minio_credential_secrets : toset(concat(local.minio_credential_secrets, var.secrets))
 
   secret_map = {
@@ -48,7 +48,7 @@ locals {
     var.env
   )
 
-  minio_data_mount = toset([
+  minio_data_mount = [
     {
       target         = local.minio_data_dir
       source         = module.minio_docker_volume.this.name
@@ -57,7 +57,7 @@ locals {
       tmpfs_options  = null
       volume_options = null
     }
-  ])
+  ]
   minio_mounts = length(var.mounts) == 0 ? local.minio_data_mount : toset(concat(local.minio_data_mount, var.mounts))
 
   minio_healthcheck = coalesce(var.healthcheck,
