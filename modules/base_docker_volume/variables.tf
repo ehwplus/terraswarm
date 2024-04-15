@@ -12,8 +12,8 @@ variable "namespace" {
 
 variable "driver" {
   type        = string
-  description = "Driver type for the volume. Defaults to 'overlay2'."
-  default     = "overlay2"
+  description = "Driver type for the volume. Defaults to 'local'."
+  default     = "local"
 }
 
 variable "driver_options" {
