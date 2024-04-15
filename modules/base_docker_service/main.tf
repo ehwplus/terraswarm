@@ -19,7 +19,7 @@ locals {
       volume_options = null
     }
   ]
-  all_mounts = var.mounts == null ? local.default_mounts : toset(concat(local.default_mounts, var.mounts))
+  all_mounts = var.mounts == null ? local.default_mounts : toset(concat(local.default_mounts, tolist(var.mounts)))
 
   #
   # local labels
