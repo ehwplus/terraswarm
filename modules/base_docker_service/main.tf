@@ -19,7 +19,7 @@ locals {
       volume_options = null
     }
   ])
-  all_mounts = length(var.mounts) == 0 ? local.default_mounts : setunion(local.default_mounts, var.mounts)
+  all_mounts = var.mounts == null ? local.default_mounts : setunion(local.default_mounts, var.mounts)
 
   #
   # local labels

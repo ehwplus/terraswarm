@@ -164,7 +164,8 @@ variable "mounts" {
       }
     }]
   EOT
-  default     = []
+  nullable    = true
+  default     = null
 }
 
 variable "labels" {
