@@ -30,7 +30,7 @@ locals {
   #
   # So in accordance with https://github.com/grafana/tempo/blob/main/cmd/tempo/Dockerfile
   # we have to include the entrypoint from the Dockerfile in the service command array.
-  command = compact(flatten(["/tempo", var.tempo_config == null ? null : "-config.file=${local.this_config_file_name}", var.args]))
+  command = compact(concat(["/tempo", var.tempo_config == null ? "" : "-config.file=${local.this_config_file_name}"], var.args))
 
   this_config_file_name = "/etc/tempo.yml"
 }
