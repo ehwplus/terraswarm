@@ -104,8 +104,7 @@ module "create_bucket" {
   healthcheck    = local.init_healthcheck
   restart_policy = { condition = "on-failure" }
 
-
-  depends_on = [random_string.minio_access_key, random_password.minio_secret_key, module.minio_docker_volume]
+  depends_on = [random_string.minio_access_key, random_password.minio_secret_key, module.minio_docker_service]
 }
 
 module "minio_docker_volume" {
@@ -118,16 +117,15 @@ module "minio_docker_volume" {
 module "minio_docker_service" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
-  name        = local.name
-  namespace   = local.namespace
-  image       = local.image
-  image_tag   = local.image_tag
-  env         = local.minio_env
-  ports       = local.minio_ports
-  mounts      = local.minio_mounts
-  healthcheck = local.minio_healthcheck
-  secret_map  = local.secret_map
-
+  name            = local.name
+  namespace       = local.namespace
+  image           = local.image
+  image_tag       = local.image_tag
+  env             = local.minio_env
+  ports           = local.minio_ports
+  mounts          = local.minio_mounts
+  healthcheck     = local.minio_healthcheck
+  secret_map      = local.secret_map
   args            = concat(["server", "--address", ":${local.minio_api_port}", "--console-address", ":${local.minio_ui_port}", local.minio_data_dir], var.args)
   auth            = var.auth # container registry auth for private minio images
   constraints     = var.constraints
@@ -139,5 +137,5 @@ module "minio_docker_service" {
   reservation     = var.reservation
   restart_policy  = var.restart_policy
 
-  depends_on = [random_string.minio_access_key, random_password.minio_secret_key, module.minio_docker_volume, module.create_bucket]
+  depends_on = [random_string.minio_access_key, random_password.minio_secret_key, module.minio_docker_volume]
 }
