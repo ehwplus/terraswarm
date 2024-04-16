@@ -12,7 +12,7 @@ locals {
     {
       config_data = var.prometheus_config
       file_name   = local.this_config_file_name
-      file_mode   = 0400
+      file_mode   = 0440
     }
   ]
 
