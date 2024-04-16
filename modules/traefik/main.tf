@@ -52,7 +52,9 @@ locals {
     var.ports
   ))
 
-  healthcheck = merge({ test = ["traefik", "healthcheck", "--ping"] }, var.healthcheck)
+  args = concat(["--ping=true"], var.args)
+
+  healthcheck = merge({ test = ["traefik", "healthcheck"] }, var.healthcheck)
 
   name      = coalesce(var.name, "traefik")
   namespace = coalesce(var.namespace, "gateway")
@@ -76,8 +78,8 @@ module "traefik_docker_service" {
   image_tag       = local.image_tag
   mounts          = local.mounts
   ports           = local.ports
+  args            = local.args
   healthcheck     = local.healthcheck
-  args            = var.args
   auth            = var.auth # container registry auth for private traefik images
   configs         = [{ config_data = var.traefik_config, file_name = "/etc/traefik/traefik.yaml", file_mode = 0740 }]
   constraints     = var.constraints
