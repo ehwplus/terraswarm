@@ -10,13 +10,13 @@ locals {
   #
   # So in accordance with https://github.com/grafana/tempo/blob/main/cmd/tempo/Dockerfile
   # we have to include the entrypoint from the Dockerfile in the service command array.
-  command = [
+  command = compact([
     "/start-from-init",
-    "--config", local.this_default_config_file_name,
-    "--config", local.this_step_config_file_name,
+    var.zitadel_default_config == "" ? "" : "--config", local.this_default_config_file_name,
+    var.zitadel_step_config == "" ? "" : "--config", local.this_step_config_file_name,
     "--masterkey", resource.random_password.masterkey.result,
     "--tlsMode", "disabled"
-  ]
+  ])
 
   this_default_config_file_name = "/default.yaml"
 
@@ -24,15 +24,15 @@ locals {
 
   configs = toset(concat(
     [
-      {
+      var.zitadel_default_config == "" ? null : {
         config_data = var.zitadel_default_config
         file_name   = local.this_default_config_file_name
-        file_mode   = 0444
+        file_mode   = 0400
       },
-      {
+      var.zitadel_step_config == "" ? null : {
         config_data = var.zitadel_step_config
         file_name   = local.this_step_config_file_name
-        file_mode   = 0444
+        file_mode   = 0400
       }
     ],
     tolist(var.configs)

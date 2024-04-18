@@ -371,12 +371,14 @@ variable "zitadel_default_config" {
   type        = string
   description = "The default configuration for Zitadel"
   nullable    = false
+  default     = ""
 }
 
 variable "zitadel_step_config" {
   type        = string
   description = "A step configuration for Zitadel"
   nullable    = false
+  default     = ""
 }
 
 variable "zitadel_service_port" {
