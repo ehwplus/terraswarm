@@ -22,35 +22,33 @@ locals {
 
   this_step_config_file_name = "/step.yaml"
 
-  configs = setunion(
-    toset([
+  configs = toset(concat(
+    [
       {
         config_data = var.zitadel_default_config
         file_name   = local.this_default_config_file_name
-        file_mode   = 0400
+        file_mode   = 0444
       },
       {
         config_data = var.zitadel_step_config
         file_name   = local.this_step_config_file_name
-        file_mode   = 0400
+        file_mode   = 0444
       }
-    ]),
-    var.configs
-  )
+    ],
+    tolist(var.configs)
+  ))
 
-  secrets = setunion(
-    toset([
-      for _, secret in module.postgres_docker_service.postgresql_secret :
-      {
-        secret_id = secret.id
-      }
-    ]),
-    var.secrets
-  )
+  zitadel_secrets = [
+    for _, secret in module.postgres_docker_service.postgresql_secret :
+    {
+      secret_id = secret.id
+    }
+  ]
+  secrets = length(var.secrets) == 0 ? local.zitadel_secrets : concat(local.zitadel_secrets, tolist(var.secrets))
 
-  networks = setunion(var.networks, toset([docker_network.this]))
+  networks = toset(concat(tolist(var.networks), [docker_network.this.name]))
 
-  zitadel_port = 8080 # TODO: potentially causes issues when Port is changed in config
+  zitadel_port = var.zitadel_internal_port # TODO: potentially causes issues when Port is changed in config
   zitadel_ports = concat([
     {
       name           = "zitadel"
