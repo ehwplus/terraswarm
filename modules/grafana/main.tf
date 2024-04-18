@@ -23,23 +23,24 @@ locals {
     "GF_INSTALL_PLUGINS"         = "grafana-piechart-panel"
   }, var.env)
 
-  healthcheck = coalesce(
-    var.healthcheck, {
-      test         = ["CMD", "wget", "http://localhost:${local.grafana_internal_port}/api/health"]
-      interval     = "10s"
-      timeout      = "15s"
-      retries      = 10
-      start_period = "40s"
-    }
-  )
+  # healthcheck = coalesce(
+  #   var.healthcheck, {
+  #     test         = ["CMD", "wget", "http://localhost:${local.grafana_internal_port}/api/health"]
+  #     interval     = "10s"
+  #     timeout      = "15s"
+  #     retries      = 10
+  #     start_period = "40s"
+  #   }
+  # )
+  healthcheck = merge({ test = ["curl", "http://localhost:${local.grafana_internal_port}/api/health"] }, var.healthcheck)
 
   mounts = [{
     target         = local.grafana_mount_path
     source         = module.grafana_docker_volume.this.name
     type           = "volume"
     read_only      = false
-    tmpfs_options  = null
-    volume_options = null
+    tmpfs_options  = {}
+    volume_options = {}
   }]
 
   ports = [

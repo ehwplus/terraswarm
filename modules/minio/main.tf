@@ -54,8 +54,8 @@ locals {
       source         = module.minio_docker_volume.this.name
       type           = "volume"
       read_only      = false
-      tmpfs_options  = null
-      volume_options = null
+      tmpfs_options  = {}
+      volume_options = {}
     }
   ]
   minio_mounts = length(var.mounts) == 0 ? local.minio_data_mount : concat(tolist(local.minio_data_mount), tolist(var.mounts))
@@ -99,7 +99,7 @@ module "create_bucket" {
   networks  = var.networks
   command = [
     "/bin/sh", "-c",
-    "/usr/bin/mc config host add minioInst http://${local.name}:${local.minio_api_port} '${resource.random_string.minio_access_key.result}' '${resource.random_password.minio_secret_key.result}' ; /usr/bin/mc rm -r --force minioInst${local.minio_data_dir} ; /usr/bin/mc mb minioInst${local.minio_data_dir} && /usr/bin/mc policy download minioInst${local.minio_data_dir} && exit 0"
+    "until(/usr/bin/mc config host add minioInst http://${local.name}:${local.minio_api_port} '${resource.random_string.minio_access_key.result}' '${resource.random_password.minio_secret_key.result}') do echo '...waiting...' && sleep 1; done; /usr/bin/mc rm -r --force minioInst${local.minio_data_dir}; /usr/bin/mc mb minioInst${local.minio_data_dir} && /usr/bin/mc policy download minioInst${local.minio_data_dir} && exit 0;"
   ]
   healthcheck    = local.init_healthcheck
   restart_policy = { condition = "on-failure" }

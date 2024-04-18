@@ -17,15 +17,16 @@ locals {
     }
   ]
 
-  healthcheck = coalesce(
-    var.healthcheck, {
-      test         = ["wget --no-verbose --tries=1 --spider http://${local.name}:${local.loki_internal_port}/ready || exit 1"]
-      interval     = "10s"
-      timeout      = "15s"
-      retries      = 10
-      start_period = "40s"
-    }
-  )
+  # healthcheck = coalesce(
+  #   var.healthcheck, {
+  #     test         = ["wget --no-verbose --tries=1 --spider http://${local.name}:${local.loki_internal_port}/ready || exit 1"]
+  #     interval     = "10s"
+  #     timeout      = "15s"
+  #     retries      = 10
+  #     start_period = "40s"
+  #   }
+  # )
+  healthcheck = merge({ test = ["wget --no-verbose --tries=1 --spider http://${local.name}:${local.loki_internal_port}/ready"] }, var.healthcheck)
 
   mounts = [
     {
@@ -33,8 +34,8 @@ locals {
       source         = module.loki_docker_volume.this.name
       type           = "volume"
       read_only      = false
-      tmpfs_options  = null
-      volume_options = null
+      tmpfs_options  = {}
+      volume_options = {}
     }
   ]
 

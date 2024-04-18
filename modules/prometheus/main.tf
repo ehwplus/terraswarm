@@ -16,15 +16,16 @@ locals {
     }
   ]
 
-  healthcheck = coalesce(
-    var.healthcheck, {
-      test         = ["CMD", "wget", "http://localhost:${local.prometheus_internal_port}/-/healthy"]
-      interval     = "10s"
-      timeout      = "15s"
-      retries      = 10
-      start_period = "40s"
-    }
-  )
+  # healthcheck = coalesce(
+  #   var.healthcheck, {
+  #     test         = ["CMD", "wget", "http://localhost:${local.prometheus_internal_port}/-/healthy"]
+  #     interval     = "10s"
+  #     timeout      = "15s"
+  #     retries      = 10
+  #     start_period = "40s"
+  #   }
+  # )
+  healthcheck = merge({ test = ["curl", "-I", "http://localhost:${local.prometheus_internal_port}/-/healthy"] }, var.healthcheck)
 
   mounts = [
     {
@@ -32,8 +33,8 @@ locals {
       source         = module.prometheus_docker_volume.this.name
       type           = "volume"
       read_only      = false
-      tmpfs_options  = null
-      volume_options = null
+      tmpfs_options  = {}
+      volume_options = {}
     }
   ]
 

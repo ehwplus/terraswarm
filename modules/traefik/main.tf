@@ -11,16 +11,16 @@ locals {
       source         = "/var/run/docker.sock"
       type           = "bind"
       read_only      = true
-      tmpfs_options  = null
-      volume_options = null
+      tmpfs_options  = {}
+      volume_options = {}
     },
     {
       target         = "/etc/certs"
       source         = module.traefik_docker_volume.this.name
       type           = "volume"
       read_only      = false
-      tmpfs_options  = null
-      volume_options = null
+      tmpfs_options  = {}
+      volume_options = {}
     }
     # {
     #   target = "/etc/certificates"
