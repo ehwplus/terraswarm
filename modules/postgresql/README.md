@@ -60,7 +60,10 @@
 
 | Name | Description |
 |------|-------------|
+| <a name="output_database"></a> [database](#output\_database) | The PostgreSQL database. |
+| <a name="output_host"></a> [host](#output\_host) | The PostgreSQL service name which is also a network alias. |
 | <a name="output_password"></a> [password](#output\_password) | The PostgreSQL password. |
+| <a name="output_port"></a> [port](#output\_port) | The PostgreSQL service port. |
 | <a name="output_postgresql_secret"></a> [postgresql\_secret](#output\_postgresql\_secret) | The PostgreSQL docker secrets. |
 | <a name="output_this"></a> [this](#output\_this) | The PostgreSQL docker service. |
 | <a name="output_user"></a> [user](#output\_user) | The PostgreSQL user. |
