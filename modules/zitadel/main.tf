@@ -48,7 +48,7 @@ locals {
 
   networks = toset(concat(tolist(var.networks), [docker_network.this.name]))
 
-  zitadel_port = var.zitadel_internal_port # TODO: potentially causes issues when Port is changed in config
+  zitadel_port = var.zitadel_service_port # TODO: potentially causes issues when Port is changed in config
   zitadel_ports = concat([
     {
       name           = "zitadel"

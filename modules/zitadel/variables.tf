@@ -379,7 +379,7 @@ variable "zitadel_step_config" {
   nullable    = false
 }
 
-variable "zitadel_internal_port" {
+variable "zitadel_service_port" {
   type        = string
   description = "The zitadel internal port. Make sure to have this in sync with your custom config if set."
   nullable    = false
