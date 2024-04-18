@@ -3,7 +3,7 @@ output "zitadel_service" {
   description = "The Zitadel service."
 }
 
-output "postgres" {
+output "postgresql_service" {
   value       = module.postgres_docker_service.this
   description = "The Zitadel PostgreSQL database."
   sensitive   = true

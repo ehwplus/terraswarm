@@ -70,6 +70,6 @@ Secure authentication management for your application. Customize as you grow, wi
 | Name | Description |
 |------|-------------|
 | <a name="output_masterkey"></a> [masterkey](#output\_masterkey) | The Zitadel master key. |
-| <a name="output_postgres"></a> [postgres](#output\_postgres) | The Zitadel PostgreSQL database. |
+| <a name="output_postgresql_service"></a> [postgresql\_service](#output\_postgresql\_service) | The Zitadel PostgreSQL database. |
 | <a name="output_zitadel_service"></a> [zitadel\_service](#output\_zitadel\_service) | The Zitadel service. |
 <!-- END_TF_DOCS -->
