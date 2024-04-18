@@ -16,7 +16,9 @@ variable "namespace" {
 
 variable "custom_image" {
   type        = string
-  description = "The docker image name excluding the image tag"
+  description = "(Optional) The docker image name excluding the image tag"
+  nullable    = true
+  default     = null
 }
 
 variable "image_tag" {
