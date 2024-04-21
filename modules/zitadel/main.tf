@@ -38,13 +38,13 @@ locals {
     tolist(var.configs)
   ))
 
-  zitadel_secrets = [
-    for _, secret in module.postgres_docker_service.postgresql_secret :
-    {
-      secret_id = secret.id
-    }
-  ]
-  secrets = length(var.secrets) == 0 ? local.zitadel_secrets : concat(local.zitadel_secrets, tolist(var.secrets))
+  # zitadel_secrets = [
+  #   for _, secret in module.postgres_docker_service.postgresql_secret :
+  #   {
+  #     secret_id = secret.id
+  #   }
+  # ]
+  # secrets = length(var.secrets) == 0 ? local.zitadel_secrets : concat(local.zitadel_secrets, tolist(var.secrets))
 
   networks = toset(concat(tolist(var.networks), [docker_network.this.name]))
 
@@ -88,20 +88,26 @@ module "postgres_docker_service" {
 module "zitadel_docker_service" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
-  name      = local.name
-  namespace = local.namespace
-  image     = local.image
-  image_tag = local.image_tag
-  command   = local.command
-  networks  = local.networks
-  ports     = local.zitadel_ports
-  configs   = local.configs
-  secrets   = local.secrets
-
-  args            = var.args
-  auth            = var.auth # container registry auth for private zitadel images
-  constraints     = var.constraints
-  env             = var.env
+  name        = local.name
+  namespace   = local.namespace
+  image       = local.image
+  image_tag   = local.image_tag
+  command     = local.command
+  networks    = local.networks
+  ports       = local.zitadel_ports
+  configs     = local.configs
+  secrets     = var.secrets # local.secrets
+  args        = var.args
+  auth        = var.auth # container registry auth for private zitadel images
+  constraints = var.constraints
+  env = merge(var.env, {
+    # FIXME https://github.com/zitadel/zitadel/issues/6860
+    ZITADEL_DATABASE_POSTGRES_HOST          = module.postgres_docker_service.host
+    ZITADEL_DATABASE_POSTGRES_PORT          = module.postgres_docker_service.port
+    ZITADEL_DATABASE_POSTGRES_DATABASE      = module.postgres_docker_service.database
+    ZITADEL_DATABASE_POSTGRES_USER_USERNAME = nonsensitive(module.postgres_docker_service.user)
+    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD = nonsensitive(module.postgres_docker_service.password)
+  })
   healthcheck     = var.healthcheck
   labels          = var.labels
   limit           = var.limit
@@ -112,5 +118,5 @@ module "zitadel_docker_service" {
   restart_policy  = var.restart_policy
   secret_map      = var.secret_map
 
-  depends_on = [docker_network.this, module.postgres_docker_service, random_password.masterkey]
+  depends_on = [docker_network.this, random_password.masterkey, module.postgres_docker_service]
 }
