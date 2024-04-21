@@ -52,15 +52,23 @@ locals {
     [
       {
         file_name   = "POSTGRES_USER"
-        secret_data = resource.random_string.postgres_user.result
+        secret_data = nonsensitive(resource.random_string.postgres_user.result)
       },
       {
         file_name   = "POSTGRES_PASSWORD"
-        secret_data = resource.random_password.postgres_password.result
+        secret_data = nonsensitive(resource.random_password.postgres_password.result)
       }
     ],
     var.secrets
   )
+
+  secret_map = merge(var.secret_map, {
+    for secret in local.secrets :
+    secret.file_name => {
+      file_name   = secret.file_name,
+      secret_data = secret.secret_data,
+    }
+  })
 }
 
 resource "random_string" "postgres_user" {
@@ -68,6 +76,7 @@ resource "random_string" "postgres_user" {
   min_upper = 16
   special   = false
 }
+
 resource "random_password" "postgres_password" {
   length           = 64
   special          = true
@@ -90,7 +99,7 @@ module "postgresql_docker_service" {
   image_tag       = local.image_tag
   mounts          = local.mounts
   env             = local.env
-  secrets         = local.secrets
+  secret_map      = local.secret_map
   ports           = local.ports
   healthcheck     = local.healthcheck
   args            = var.args
@@ -105,7 +114,6 @@ module "postgresql_docker_service" {
   network_aliases = var.network_aliases
   reservation     = var.reservation
   restart_policy  = var.restart_policy
-  secret_map      = var.secret_map
 
   depends_on = [random_string.postgres_user, random_password.postgres_password, module.postgresql_docker_volume]
 }
