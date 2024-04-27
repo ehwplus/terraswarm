@@ -101,14 +101,15 @@ module "zitadel_docker_service" {
   args        = var.args
   auth        = var.auth # container registry auth for private zitadel images
   constraints = var.constraints
-  env = merge(var.env, {
+  env = merge({
     # FIXME https://github.com/zitadel/zitadel/issues/6860
     ZITADEL_DATABASE_POSTGRES_HOST          = module.postgres_docker_service.host
     ZITADEL_DATABASE_POSTGRES_PORT          = module.postgres_docker_service.port
     ZITADEL_DATABASE_POSTGRES_DATABASE      = module.postgres_docker_service.database
     ZITADEL_DATABASE_POSTGRES_USER_USERNAME = nonsensitive(module.postgres_docker_service.user)
     ZITADEL_DATABASE_POSTGRES_USER_PASSWORD = nonsensitive(module.postgres_docker_service.password)
-  })
+    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE = "disable"
+  }, var.env)
   healthcheck     = var.healthcheck
   labels          = var.labels
   limit           = var.limit
