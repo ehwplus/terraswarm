@@ -18,7 +18,7 @@ locals {
 
   healthcheck = coalesce(
     var.healthcheck, {
-      test         = ["pg_isready", "-h", "localhost"] #  "-U", "${random_string.postgres_user.result}"
+      test         = ["CMD-SHELL", "pg_isready", "-d", var.postgres_database, "-U", nonsensitive(random_string.postgres_user.result)]
       interval     = "2s"
       timeout      = "5s"
       start_period = "5s"
