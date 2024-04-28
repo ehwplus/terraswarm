@@ -28,14 +28,12 @@ locals {
       var.zitadel_default_config == "" ? null : {
         config_data = var.zitadel_default_config
         file_name   = local.this_default_config_file_name
-        file_mode   = 0400
-        file_uid    = "zitadel"
+        file_mode   = 0444
       },
       var.zitadel_step_config == "" ? null : {
         config_data = var.zitadel_step_config
         file_name   = local.this_step_config_file_name
-        file_mode   = 0400
-        file_uid    = "zitadel"
+        file_mode   = 0444
       }
     ],
     tolist(var.configs)
