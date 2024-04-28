@@ -105,12 +105,14 @@ module "zitadel_docker_service" {
   constraints = var.constraints
   env = merge({
     # FIXME https://github.com/zitadel/zitadel/issues/6860
-    ZITADEL_DATABASE_POSTGRES_HOST          = module.postgres_docker_service.host
-    ZITADEL_DATABASE_POSTGRES_PORT          = module.postgres_docker_service.port
-    ZITADEL_DATABASE_POSTGRES_DATABASE      = module.postgres_docker_service.database
-    ZITADEL_DATABASE_POSTGRES_USER_USERNAME = nonsensitive(module.postgres_docker_service.user)
-    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD = nonsensitive(module.postgres_docker_service.password)
-    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE = "disable"
+    ZITADEL_DATABASE_POSTGRES_HOST           = module.postgres_docker_service.host
+    ZITADEL_DATABASE_POSTGRES_PORT           = module.postgres_docker_service.port
+    ZITADEL_DATABASE_POSTGRES_DATABASE       = module.postgres_docker_service.database
+    ZITADEL_DATABASE_POSTGRES_USER_USERNAME  = nonsensitive(module.postgres_docker_service.user)
+    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD  = nonsensitive(module.postgres_docker_service.password)
+    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE  = "disable"
+    ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME = nonsensitive(module.postgres_docker_service.user)
+    ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD = nonsensitive(module.postgres_docker_service.password)
   }, var.env)
   healthcheck     = var.healthcheck
   labels          = var.labels
