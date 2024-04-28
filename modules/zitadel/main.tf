@@ -14,7 +14,7 @@ locals {
     "/app/zitadel",
     "start-from-init",
     var.zitadel_default_config == "" ? "" : "--config", local.this_default_config_file_name,
-    var.zitadel_step_config == "" ? "" : "--config", local.this_step_config_file_name,
+    var.zitadel_step_config == "" ? "" : "--steps", local.this_step_config_file_name,
     "--masterkey", resource.random_password.masterkey.result,
     "--tlsMode", "disabled"
   ])
