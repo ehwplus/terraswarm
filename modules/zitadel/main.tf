@@ -65,7 +65,7 @@ locals {
 }
 
 resource "random_password" "masterkey" {
-  length           = 64
+  length           = 32
   special          = true
   override_special = "#!&+{}<>"
 }
