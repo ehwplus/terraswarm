@@ -11,6 +11,7 @@ locals {
       "POSTGRES_USER_FILE"     = "/run/secrets/POSTGRES_USER"
       "POSTGRES_PASSWORD_FILE" = "/run/secrets/POSTGRES_PASSWORD"
       "POSTGRES_DB"            = var.postgres_database
+      "PGUSER_FILE"            = "/run/secrets/POSTGRES_USER"
       "PGDATA"                 = "/var/lib/postgresql/data/pdata"
     },
     var.env
