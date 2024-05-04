@@ -64,6 +64,7 @@ Secure authentication management for your application. Customize as you grow, wi
 | <a name="input_zitadel_default_config"></a> [zitadel\_default\_config](#input\_zitadel\_default\_config) | The default configuration for Zitadel | `string` | `""` | no |
 | <a name="input_zitadel_service_port"></a> [zitadel\_service\_port](#input\_zitadel\_service\_port) | The zitadel internal port. Make sure to have this in sync with your custom config if set. | `string` | `8080` | no |
 | <a name="input_zitadel_step_config"></a> [zitadel\_step\_config](#input\_zitadel\_step\_config) | A step configuration for Zitadel | `string` | `""` | no |
+| <a name="input_zitadel_tls_mode"></a> [zitadel\_tls\_mode](#input\_zitadel\_tls\_mode) | To run ZITADEL on any kind of infrastructure, you can configure on how to handle TLS connections. There are three modes of operation: disabled, external, enabled. | `string` | `"disabled"` | no |
 
 ## Outputs
 

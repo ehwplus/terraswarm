@@ -16,7 +16,7 @@ locals {
     var.zitadel_default_config == "" ? "" : "--config", local.this_default_config_file_name,
     var.zitadel_step_config == "" ? "" : "--steps", local.this_step_config_file_name,
     "--masterkey", resource.random_password.masterkey.result,
-    "--tlsMode", "disabled"
+    "--tlsMode", var.zitadel_tls_mode
   ])
 
   this_default_config_file_name = "/default.yaml"
@@ -47,7 +47,7 @@ locals {
   # ]
   # secrets = length(var.secrets) == 0 ? local.zitadel_secrets : concat(local.zitadel_secrets, tolist(var.secrets))
 
-  networks = toset(concat(tolist(var.networks), [docker_network.this.name]))
+  networks = toset(concat([docker_network.this.name], tolist(var.networks)))
 
   zitadel_port = var.zitadel_service_port # TODO: potentially causes issues when Port is changed in config
   zitadel_ports = concat([

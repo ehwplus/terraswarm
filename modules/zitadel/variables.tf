@@ -389,3 +389,15 @@ variable "zitadel_service_port" {
   nullable    = false
   default     = 8080
 }
+
+variable "zitadel_tls_mode" {
+  type        = string
+  description = "To run ZITADEL on any kind of infrastructure, you can configure on how to handle TLS connections. There are three modes of operation: disabled, external, enabled."
+  nullable    = false
+  default     = "disabled"
+
+  validation {
+    condition     = contains(["disabled", "external", "enabled"], var.zitadel_tls_mode)
+    error_message = "zitadel_tls_mode must be one of: disabled, external, enabled."
+  }
+}
