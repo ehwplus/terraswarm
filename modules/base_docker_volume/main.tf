@@ -1,12 +1,3 @@
-locals {
-  common_deployment_labels = {
-    controlled_by                   = "terraform"
-    "io.terraform.provider.source"  = "kreuzwerker/docker"
-    "io.terraform.provider.version" = "3.0.2"
-    deployed_at                     = timestamp()
-  }
-}
-
 resource "docker_volume" "this" {
   name        = substr(join("_", compact([var.namespace, "vol", var.name, uuid()])), 0, 63)
   driver      = var.driver
@@ -20,17 +11,28 @@ resource "docker_volume" "this" {
     }
   }
 
-  dynamic "labels" {
-    for_each = local.common_deployment_labels
-    content {
-      label = labels.key
-      value = labels.value
-    }
+  labels {
+    label = "controlled_by"
+    value = "terraform"
+  }
+
+  labels {
+    label = "io.terraform.provider.source"
+    value = "kreuzwerker/docker"
+  }
+
+  labels {
+    label = "io.terraform.provider.version"
+    value = "3.0.2"
+  }
+
+  labels {
+    label = "deployed_at"
+    value = timestamp()
   }
 
   lifecycle {
-    ignore_changes = [name]
-    # create_before_destroy = true
-    # prevent_destroy = true
+    // FIXME we have to ignore all labels: https://github.com/hashicorp/terraform/issues/26359
+    ignore_changes = [name, labels]
   }
 }
