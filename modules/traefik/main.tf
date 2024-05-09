@@ -2,8 +2,8 @@
 locals {
   certificate = {
     # set source to traefik_docker_volume if driver is local
-    source = var.traefik_certificate.driver == null || var.traefik_certificate.driver == "local" ? var.traefik_certificate.source : module.traefik_docker_volume.this.name
-    type   = var.traefik_certificate.driver == null || var.traefik_certificate.driver == "local" ? (var.traefik_certificate.source == null ? "volume" : var.traefik_certificate.type) : "volume"
+    source = var.traefik_certificate.driver_name == null || var.traefik_certificate.driver_name == "local" ? var.traefik_certificate.source : module.traefik_docker_volume.this.name
+    type   = var.traefik_certificate.driver_name == null || var.traefik_certificate.driver_name == "local" ? (var.traefik_certificate.source == null ? "volume" : var.traefik_certificate.type) : "volume"
   }
 
   mounts = toset(concat([
@@ -16,13 +16,15 @@ locals {
       volume_options = {}
     },
     {
-      driver         = var.traefik_certificate.driver
-      target         = var.traefik_certificate.target
-      source         = local.certificate.source
-      type           = local.certificate.type
-      read_only      = false
-      tmpfs_options  = {}
-      volume_options = {}
+      target        = var.traefik_certificate.target
+      source        = local.certificate.source
+      type          = local.certificate.type
+      read_only     = false
+      tmpfs_options = {}
+      volume_options = {
+        driver_name    = var.traefik_certificate.driver_name
+        driver_options = var.traefik_certificate.driver_options
+      }
     },
     {
       target         = "/etc/traefik"

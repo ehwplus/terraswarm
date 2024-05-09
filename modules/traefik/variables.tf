@@ -341,10 +341,11 @@ variable "traefik_config" {
 
 variable "traefik_certificate" {
   type = object({
-    driver = optional(string, "local"),
-    source = optional(string),
-    target = optional(string, "/etc/certificates")
-    type   = optional(string, "bind")
+    driver_name    = optional(string, "local"),
+    driver_options = optional(map(string))
+    source         = optional(string),
+    target         = optional(string, "/etc/certificates")
+    type           = optional(string, "bind")
   })
   description = "Configuration settings for a Docker volume used by Traefik to manage SSL certificates. The 'driver' field allows for driver-specific options in a map format. The 'source' field specifies the path or identifier of the volume source. The 'target' field defines the destination path within the container, defaulting to '/etc/certificates'. The 'type' field indicates the mount type, with 'bind' as the default."
   default = {
