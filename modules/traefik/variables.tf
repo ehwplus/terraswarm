@@ -339,19 +339,25 @@ variable "traefik_config" {
   default     = null
 }
 
+variable "traefik_certificate" {
+  type = object({
+    driver = optional(string, "local"),
+    source = optional(string),
+    target = optional(string, "/etc/certificates")
+    type   = optional(string, "bind")
+  })
+  description = "Configuration settings for a Docker volume used by Traefik to manage SSL certificates. The 'driver' field allows for driver-specific options in a map format. The 'source' field specifies the path or identifier of the volume source. The 'target' field defines the destination path within the container, defaulting to '/etc/certificates'. The 'type' field indicates the mount type, with 'bind' as the default."
+  default = {
+    driver = "local",
+    source = "/path/to/certificate",
+    type   = "bind"
+  }
+
+}
+
 # TODO volume vs file bind mount? Only really needed for TCP/HTTP reverse proxy pass to resources outside the Swarm cluster
 # variable "dynamic_configs" {
 #   type        = map(string)
-#   description = "The dynamic config files for traefik"
-#   default     = {}
-# }
-
-# variable "certificate" {
-#   type = object({
-#     driver = optional(map(any)),
-#     source = optional(string)
-#     type   = optional(string, "bind")
-#   })
 #   description = "The dynamic config files for traefik"
 #   default     = {}
 # }

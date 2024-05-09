@@ -1,9 +1,10 @@
 
 locals {
-  # certificate = {
-  #   source = var.certificate.driver == null ? var.certificate.source : null
-  #   type   = var.certificate.driver == null ? (var.certificate.source == null ? "volume" : var.certificate.type) : "volume"
-  # }
+  certificate = {
+    # set source to traefik_docker_volume if driver is local
+    source = var.traefik_certificate.driver == null || var.traefik_certificate.driver == "local" ? var.traefik_certificate.source : module.traefik_docker_volume.this.name
+    type   = var.traefik_certificate.driver == null || var.traefik_certificate.driver == "local" ? (var.traefik_certificate.source == null ? "volume" : var.traefik_certificate.type) : "volume"
+  }
 
   mounts = toset(concat([
     {
@@ -15,7 +16,16 @@ locals {
       volume_options = {}
     },
     {
-      target         = "/etc/certs"
+      driver         = var.traefik_certificate.driver
+      target         = var.traefik_certificate.target
+      source         = local.certificate.source
+      type           = local.certificate.type
+      read_only      = false
+      tmpfs_options  = {}
+      volume_options = {}
+    },
+    {
+      target         = "/etc/traefik"
       source         = module.traefik_docker_volume.this.name
       type           = "volume"
       read_only      = false
@@ -61,6 +71,8 @@ locals {
   image     = coalesce(var.custom_image, "traefik")
   image_tag = coalesce(var.image_tag, "v3.0")
 }
+
+// trunk-ignore-all(tflint/terraform_module_pinned_source)
 
 module "traefik_docker_volume" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_volume?ref=main"
