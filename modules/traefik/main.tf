@@ -1,9 +1,9 @@
 
 locals {
   certificate = {
-    # set source to traefik_docker_volume if driver is local
-    source = var.traefik_certificate.driver_name == null || var.traefik_certificate.driver_name == "local" ? var.traefik_certificate.source : module.traefik_docker_volume.this.name
-    type   = var.traefik_certificate.driver_name == null || var.traefik_certificate.driver_name == "local" ? (var.traefik_certificate.source == null ? "volume" : var.traefik_certificate.type) : "volume"
+    # set source to traefik_docker_volume if driver is not local
+    source = coalesce(var.traefik_certificate.source, module.traefik_docker_volume.this.name)
+    type   = coalesce(var.traefik_certificate.type, "volume")
   }
 
   mounts = toset(concat([
