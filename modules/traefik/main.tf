@@ -6,7 +6,7 @@ locals {
     type   = coalesce(var.traefik_certificate.type, "volume")
   }
 
-  mounts = toset(concat([
+  mounts = concat([
     {
       target         = "/var/run/docker.sock"
       source         = "/var/run/docker.sock"
@@ -44,7 +44,7 @@ locals {
     # }
     ],
     tolist(var.mounts)
-  ))
+  )
 
   ports = flatten(concat(
     [
