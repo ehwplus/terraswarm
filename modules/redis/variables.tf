@@ -283,3 +283,9 @@ variable "service_port" {
   nullable    = false
   default     = 6379
 }
+
+variable "custom_redis_password" {
+  type        = string
+  description = "Used to overwrite the generated redis password"
+  nullable    = true
+}

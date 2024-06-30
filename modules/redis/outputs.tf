@@ -4,7 +4,7 @@ output "redis_service" {
 }
 
 output "password" {
-  value       = random_password.redis_password.result
+  value       = local.redis_password
   description = "The Redis password."
   sensitive   = true
 }
