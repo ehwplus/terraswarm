@@ -1,3 +1,7 @@
+# infiscal
+
+See https://raw.githubusercontent.com/Infisical/infisical/main/.env.example for additionally required environmental variables.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
