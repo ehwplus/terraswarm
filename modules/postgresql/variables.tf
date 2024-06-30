@@ -318,6 +318,6 @@ variable "postgres_database" {
 
 variable "custom_postgresql_password" {
   type        = string
-  description = "Used to overwrite the generated redis password"
+  description = "A custom password for postgresql which will be used over the generated one."
   nullable    = true
 }
