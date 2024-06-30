@@ -15,7 +15,7 @@ output "user" {
 }
 
 output "password" {
-  value       = random_password.postgres_password.result
+  value       = local.database_password
   description = "The PostgreSQL password."
   sensitive   = true
 }
