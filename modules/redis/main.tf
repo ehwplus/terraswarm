@@ -4,6 +4,8 @@ locals {
   image     = coalesce(var.custom_image, "bitnami/redis")
   image_tag = coalesce(var.image_tag, "latest")
 
+  redis_password = var.custom_redis_password == null ? nonsensitive(resource.random_password.redis_password.result) : var.custom_redis_password
+
   env = merge(
     {
       "REDIS_PASSWORD_FILE" = "/run/secrets/REDIS_PASSWORD"
@@ -47,7 +49,7 @@ locals {
     [
       {
         file_name   = "REDIS_PASSWORD"
-        secret_data = nonsensitive(resource.random_password.redis_password.result)
+        secret_data = local.redis_password
       }
     ],
     var.secrets
