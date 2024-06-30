@@ -55,7 +55,7 @@ resource "random_password" "postgresql_password" {
 }
 
 module "postgres_docker_service" {
-  source = "github.com/ehwplus/terraswarm//modules/postgresql?ref=postgresql"
+  source = "github.com/ehwplus/terraswarm//modules/postgresql?ref=main"
 
   name         = local.database_name
   namespace    = local.namespace
@@ -74,7 +74,7 @@ module "postgres_docker_service" {
 }
 
 module "redis_docker_service" {
-  source = "github.com/ehwplus/terraswarm//modules/redis?ref=redis"
+  source = "github.com/ehwplus/terraswarm//modules/redis?ref=main"
 
   name         = local.redis_name
   namespace    = local.namespace
