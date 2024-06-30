@@ -286,6 +286,6 @@ variable "service_port" {
 
 variable "custom_redis_password" {
   type        = string
-  description = "Used to overwrite the generated redis password"
+  description = "A custom password for redis which will be used over the generated one."
   nullable    = true
 }
