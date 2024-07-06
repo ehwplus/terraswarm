@@ -343,7 +343,7 @@ variable "traefik_certificate" {
   type = object({
     # check https://docs.docker.com/engine/extend/legacy_plugins/#volume-plugins
     driver_name    = optional(string, "local"),
-    driver_options = optional(map(string))
+    driver_options = optional(map(string), {})
     source         = optional(string),
     target         = optional(string, "/etc/certificates")
     type           = optional(string, "bind")
