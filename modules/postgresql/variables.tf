@@ -320,4 +320,5 @@ variable "custom_postgresql_password" {
   type        = string
   description = "A custom password for postgresql which will be used over the generated one."
   nullable    = true
+  default     = null
 }

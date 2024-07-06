@@ -4,7 +4,7 @@ locals {
   image     = coalesce(var.custom_image, "postgres") # https://hub.docker.com/_/postgres
   image_tag = coalesce(var.image_tag, "16.2-alpine")
 
-  database_password = var.custom_postgresql_password == null ? nonsensitive(random_password.postgres_password.result) : var.custom_postgresql_password
+  database_password = coalesce(var.custom_postgresql_password, nonsensitive(random_password.postgres_password.result))
 
   this_postgresql_config_file = "/etc/postgresql/postgresql.conf"
 
