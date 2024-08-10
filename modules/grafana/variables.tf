@@ -114,6 +114,10 @@ variable "reservation" {
   type = object({
     cores  = optional(number)
     memory = optional(number)
+    generic_resources = optional(object({
+      discrete_resources_spec = optional(set(string))
+      named_resources_spec    = optional(set(string))
+    }))
   })
   description = "(Optional) The resource reservation of service, memory unit is MB"
   default     = null

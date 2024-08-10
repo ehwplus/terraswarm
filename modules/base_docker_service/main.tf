@@ -195,6 +195,14 @@ resource "docker_service" "this" {
           content {
             nano_cpus    = reservation.value.cores == null ? null : reservation.value.cores * 1e9
             memory_bytes = reservation.value.memory == null ? null : reservation.value.memory * 1e6
+
+            dynamic "generic_resources" {
+              for_each = reservation.value.generic_resources == null ? [] : [1]
+              content {
+                discrete_resources_spec = reservation.value.generic_resources.discrete_resources_spec
+                named_resources_spec    = reservation.value.generic_resources.discrete_resources_spec
+              }
+            }
           }
         }
       }
