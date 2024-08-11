@@ -22,26 +22,21 @@ locals {
       read_only     = false
       tmpfs_options = {}
       volume_options = {
-        driver_name    = var.traefik_certificate.driver_name
-        driver_options = var.traefik_certificate.driver_options
+        driver_name    = coalesce(var.traefik_certificate.driver_name, var.traefik_volume_options.driver)
+        driver_options = coalesce(var.traefik_certificate.driver_options, var.traefik_volume_options.driver_options)
       }
     },
     {
-      target         = "/etc/traefik"
-      source         = module.traefik_docker_volume.this.name
-      type           = "volume"
-      read_only      = false
-      tmpfs_options  = {}
-      volume_options = {}
+      target        = "/etc/traefik"
+      source        = module.traefik_docker_volume.this.name
+      type          = "volume"
+      read_only     = false
+      tmpfs_options = {}
+      volume_options = {
+        driver_name    = var.traefik_volume_options.driver
+        driver_options = var.traefik_volume_options.driver_options
+      }
     }
-    # {
-    #   target = "/etc/certificates"
-    #   source = local.certificate.source
-    #   type   = local.certificate.type
-    #   volume_options = {
-    #     driver_options = var.certificate.driver
-    #   }
-    # }
     ],
     tolist(var.mounts)
   )
@@ -79,8 +74,10 @@ locals {
 module "traefik_docker_volume" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_volume?ref=main"
 
-  name      = local.name
-  namespace = local.namespace
+  name           = local.name
+  namespace      = local.namespace
+  driver         = var.traefik_volume_options.driver
+  driver_options = var.traefik_volume_options.driver_options
 }
 
 module "traefik_docker_service" {

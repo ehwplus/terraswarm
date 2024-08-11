@@ -337,6 +337,15 @@ variable "healthcheck" {
 # Traefik
 ################################################################################
 
+variable "traefik_volume_options" {
+  type = object({
+    driver         = optional(string, "local")
+    driver_options = optional(map(string), {})
+  })
+  description = "The traefik volume driver with its options."
+  default     = {}
+}
+
 variable "traefik_config" {
   type        = string
   description = "The static config file for traefik. Config can be passed via tftpl or inline string."
