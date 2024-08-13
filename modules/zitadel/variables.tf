@@ -169,34 +169,6 @@ variable "labels" {
   default     = {}
 }
 
-variable "constraints" {
-  type        = set(string)
-  description = "(Optional) The container placement constraints"
-  default     = []
-}
-
-variable "limit" {
-  type = object({
-    cores  = optional(number)
-    memory = optional(number)
-  })
-  description = "(Optional) The resources limit of service, memory unit is MB"
-  default     = null
-}
-
-variable "reservation" {
-  type = object({
-    cores  = optional(number)
-    memory = optional(number)
-    generic_resources = optional(object({
-      discrete_resources_spec = optional(set(string))
-      named_resources_spec    = optional(set(string))
-    }))
-  })
-  description = "(Optional) The resource reservation of service, memory unit is MB"
-  default     = null
-}
-
 variable "restart_policy" {
   type = object({
     condition    = optional(string, "any")
@@ -404,4 +376,64 @@ variable "zitadel_tls_mode" {
     condition     = contains(["disabled", "external", "enabled"], var.zitadel_tls_mode)
     error_message = "zitadel_tls_mode must be one of: disabled, external, enabled."
   }
+}
+
+variable "zitadel_constraints" {
+  type        = set(string)
+  description = "(Optional) The container placement constraints specific to the Zitadel service."
+  default     = []
+}
+
+variable "zitadel_limit" {
+  type = object({
+    cores  = optional(number)
+    memory = optional(number)
+  })
+  description = "(Optional) The resource limit of the Zitadel service, memory unit is MB."
+  default     = null
+}
+
+variable "zitadel_reservation" {
+  type = object({
+    cores  = optional(number)
+    memory = optional(number)
+    generic_resources = optional(object({
+      discrete_resources_spec = optional(set(string))
+      named_resources_spec    = optional(set(string))
+    }))
+  })
+  description = "(Optional) The resource reservation for the Zitadel service, memory unit is MB."
+  default     = null
+}
+
+################################################################################
+# PostgreSQL
+################################################################################
+
+variable "postgresql_constraints" {
+  type        = set(string)
+  description = "(Optional) The container placement constraints specific to the PostgreSQL service."
+  default     = []
+}
+
+variable "postgresql_limit" {
+  type = object({
+    cores  = optional(number)
+    memory = optional(number)
+  })
+  description = "(Optional) The resource limit of the PostgreSQL service, memory unit is MB."
+  default     = null
+}
+
+variable "postgresql_reservation" {
+  type = object({
+    cores  = optional(number)
+    memory = optional(number)
+    generic_resources = optional(object({
+      discrete_resources_spec = optional(set(string))
+      named_resources_spec    = optional(set(string))
+    }))
+  })
+  description = "(Optional) The resource reservation for the PostgreSQL service, memory unit is MB."
+  default     = null
 }

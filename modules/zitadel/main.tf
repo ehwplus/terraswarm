@@ -79,9 +79,9 @@ module "postgres_docker_service" {
   networks     = [docker_network.this.name]
 
   postgres_database = var.name
-  constraints       = var.constraints
-  limit             = var.limit
-  reservation       = var.reservation
+  constraints       = var.postgresql_constraints
+  limit             = var.postgresql_limit
+  reservation       = var.postgresql_reservation
 
   depends_on = [docker_network.this]
 }
@@ -100,7 +100,7 @@ module "zitadel_docker_service" {
   secrets     = var.secrets # local.secrets
   args        = var.args
   auth        = var.auth # container registry auth for private zitadel images
-  constraints = var.constraints
+  constraints = var.zitadel_constraints
   env = merge({
     # FIXME https://github.com/zitadel/zitadel/issues/6860
     ZITADEL_DATABASE_POSTGRES_HOST           = module.postgres_docker_service.host
@@ -115,11 +115,11 @@ module "zitadel_docker_service" {
   }, var.env)
   healthcheck     = var.healthcheck
   labels          = var.labels
-  limit           = var.limit
+  limit           = var.zitadel_limit
   mode            = var.mode
   mounts          = var.mounts
   network_aliases = var.network_aliases
-  reservation     = var.reservation
+  reservation     = var.zitadel_reservation
   restart_policy  = var.restart_policy
   secret_map      = var.secret_map
 
