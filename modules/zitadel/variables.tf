@@ -341,6 +341,34 @@ variable "healthcheck" {
   default     = null
 }
 
+variable "constraints" {
+  type        = set(string)
+  description = "(Optional) The container placement constraints specific to the Zitadel service."
+  default     = []
+}
+
+variable "limit" {
+  type = object({
+    cores  = optional(number)
+    memory = optional(number)
+  })
+  description = "(Optional) The resource limit of the Zitadel service, memory unit is MB."
+  default     = null
+}
+
+variable "reservation" {
+  type = object({
+    cores  = optional(number)
+    memory = optional(number)
+    generic_resources = optional(object({
+      discrete_resources_spec = optional(set(string))
+      named_resources_spec    = optional(set(string))
+    }))
+  })
+  description = "(Optional) The resource reservation for the Zitadel service, memory unit is MB."
+  default     = null
+}
+
 ################################################################################
 # Zitadel
 ################################################################################
@@ -378,33 +406,6 @@ variable "zitadel_tls_mode" {
   }
 }
 
-variable "zitadel_constraints" {
-  type        = set(string)
-  description = "(Optional) The container placement constraints specific to the Zitadel service."
-  default     = []
-}
-
-variable "zitadel_limit" {
-  type = object({
-    cores  = optional(number)
-    memory = optional(number)
-  })
-  description = "(Optional) The resource limit of the Zitadel service, memory unit is MB."
-  default     = null
-}
-
-variable "zitadel_reservation" {
-  type = object({
-    cores  = optional(number)
-    memory = optional(number)
-    generic_resources = optional(object({
-      discrete_resources_spec = optional(set(string))
-      named_resources_spec    = optional(set(string))
-    }))
-  })
-  description = "(Optional) The resource reservation for the Zitadel service, memory unit is MB."
-  default     = null
-}
 
 ################################################################################
 # PostgreSQL

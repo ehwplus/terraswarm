@@ -73,25 +73,25 @@ resource "random_password" "masterkey" {
 module "postgres_docker_service" {
   source = "github.com/ehwplus/terraswarm//modules/postgresql?ref=main"
 
-  name         = local.database_name
-  namespace    = local.namespace
-  service_port = local.database_port
-  networks     = [docker_network.this.name]
-
+  name              = local.database_name
+  namespace         = local.namespace
+  service_port      = local.database_port
+  networks          = [docker_network.this.name]
   postgres_database = var.name
 
-  custom_image   = var.postgresql.custom_image
-  image_tag      = var.postgresql.image_tag
-  auth           = var.postgresql.auth
-  mounts         = var.postgresql.mounts
-  env            = var.postgresql.env
-  healthcheck    = var.postgresql.healthcheck
-  args           = var.postgresql.args
-  labels         = var.postgresql.labels
-  constraints    = var.postgresql.constraints
-  limit          = var.postgresql.limit
-  reservation    = var.postgresql.reservation
-  restart_policy = var.postgresql.restart_policy
+  custom_image            = var.postgresql.custom_image
+  image_tag               = var.postgresql.image_tag
+  auth                    = var.postgresql.auth
+  mounts                  = var.postgresql.mounts
+  env                     = var.postgresql.env
+  healthcheck             = var.postgresql.healthcheck
+  args                    = var.postgresql.args
+  labels                  = var.postgresql.labels
+  constraints             = var.postgresql.constraints
+  limit                   = var.postgresql.limit
+  reservation             = var.postgresql.reservation
+  restart_policy          = var.postgresql.restart_policy
+  postgres_volume_options = var.postgresql.postgres_volume_options
 
   depends_on = [docker_network.this]
 }
@@ -110,7 +110,7 @@ module "zitadel_docker_service" {
   secrets     = var.secrets # local.secrets
   args        = var.args
   auth        = var.auth # container registry auth for private zitadel images
-  constraints = var.zitadel_constraints
+  constraints = var.constraints
   env = merge({
     # FIXME https://github.com/zitadel/zitadel/issues/6860
     ZITADEL_DATABASE_POSTGRES_HOST           = module.postgres_docker_service.host
@@ -125,11 +125,11 @@ module "zitadel_docker_service" {
   }, var.env)
   healthcheck     = var.healthcheck
   labels          = var.labels
-  limit           = var.zitadel_limit
+  limit           = var.limit
   mode            = var.mode
   mounts          = var.mounts
   network_aliases = var.network_aliases
-  reservation     = var.zitadel_reservation
+  reservation     = var.reservation
   restart_policy  = var.restart_policy
   secret_map      = var.secret_map
 
