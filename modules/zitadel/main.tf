@@ -49,7 +49,7 @@ locals {
 
   networks = toset(concat([docker_network.this.name], tolist(var.networks)))
 
-  zitadel_port = var.zitadel_service_port # TODO: potentially causes issues when Port is changed in config
+  zitadel_port = var.zitadel_service_port # TODO: potentially causes issues when Port mismatches Zitadel config
   zitadel_ports = concat([
     {
       name           = "zitadel"
@@ -79,9 +79,19 @@ module "postgres_docker_service" {
   networks     = [docker_network.this.name]
 
   postgres_database = var.name
-  constraints       = var.postgresql_constraints
-  limit             = var.postgresql_limit
-  reservation       = var.postgresql_reservation
+
+  custom_image   = var.postgresql.custom_image
+  image_tag      = var.postgresql.image_tag
+  auth           = var.postgresql.auth
+  mounts         = var.postgresql.mounts
+  env            = var.postgresql.env
+  healthcheck    = var.postgresql.healthcheck
+  args           = var.postgresql.args
+  labels         = var.postgresql.labels
+  constraints    = var.postgresql.constraints
+  limit          = var.postgresql.limit
+  reservation    = var.postgresql.reservation
+  restart_policy = var.postgresql.restart_policy
 
   depends_on = [docker_network.this]
 }
