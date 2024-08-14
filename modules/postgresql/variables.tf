@@ -326,3 +326,14 @@ variable "custom_postgresql_password" {
   nullable    = true
   default     = null
 }
+
+variable "postgres_volume_options" {
+  type = object({
+    driver_name    = optional(string)
+    driver_options = optional(map(string))
+    labels         = optional(map(string))
+    no_copy        = optional(bool)
+  })
+  description = "The PostgreSQL data volume driver with its options."
+  default     = {}
+}

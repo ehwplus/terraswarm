@@ -2,7 +2,7 @@ locals {
   name      = coalesce(var.name, "postgres")
   namespace = coalesce(var.namespace, "database")
   image     = coalesce(var.custom_image, "postgres") # https://hub.docker.com/_/postgres
-  image_tag = coalesce(var.image_tag, "16.2-alpine")
+  image_tag = coalesce(var.image_tag, "16-alpine")
 
   database_password = coalesce(var.custom_postgresql_password, nonsensitive(random_password.postgres_password.result))
 
@@ -36,7 +36,7 @@ locals {
       type           = "volume"
       read_only      = false
       tmpfs_options  = null
-      volume_options = null
+      volume_options = var.postgres_volume_options
     }],
     var.mounts
   )
