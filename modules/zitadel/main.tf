@@ -79,7 +79,6 @@ module "postgres_docker_service" {
   networks          = [docker_network.this.name]
   postgres_database = var.name
 
-  reservation             = var.postgres_reservation
   postgres_volume_options = var.postgres_volume_options
 
   depends_on = [docker_network.this]
