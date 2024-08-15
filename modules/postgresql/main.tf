@@ -87,13 +87,17 @@ resource "random_password" "postgres_password" {
 }
 
 module "postgresql_docker_volume" {
+  # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/base_docker_volume?ref=main"
 
-  name      = local.name
-  namespace = local.namespace
+  name           = local.name
+  namespace      = local.namespace
+  driver         = var.postgres_volume_options.driver_name
+  driver_options = var.postgres_volume_options.driver_options
 }
 
 module "postgresql_docker_service" {
+  # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
   name            = local.name
