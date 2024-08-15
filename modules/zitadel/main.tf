@@ -79,19 +79,7 @@ module "postgres_docker_service" {
   networks          = [docker_network.this.name]
   postgres_database = var.name
 
-  custom_image            = var.postgresql.custom_image
-  image_tag               = var.postgresql.image_tag
-  auth                    = var.postgresql.auth
-  mounts                  = var.postgresql.mounts
-  env                     = var.postgresql.env
-  healthcheck             = var.postgresql.healthcheck
-  args                    = var.postgresql.args
-  labels                  = var.postgresql.labels
-  constraints             = var.postgresql.constraints
-  limit                   = var.postgresql.limit
-  reservation             = var.postgresql.reservation
-  restart_policy          = var.postgresql.restart_policy
-  postgres_volume_options = var.postgresql.postgres_volume_options
+  postgres_volume_options = var.postgres_volume_options
 
   depends_on = [docker_network.this]
 }
