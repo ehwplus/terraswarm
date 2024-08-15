@@ -335,6 +335,5 @@ variable "postgres_volume_options" {
     no_copy        = optional(bool)
   })
   description = "The PostgreSQL data volume driver with its options."
-  default     = null
-  nullable    = true
+  default     = {}
 }
