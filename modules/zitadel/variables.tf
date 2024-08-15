@@ -492,7 +492,7 @@ variable "postgresql" {
     - restart_policy: (Optional) Restart policy for containers.
     - auth: (Optional) The authentication for a private docker registry.
     - healthcheck: (Optional) Healthcheck configuration for the container.
-    - postgres_volume_options: The PostgreSQL data volume driver with its options.
+    - postgres_volume_options (Optional): The PostgreSQL data volume driver with its options.
   EOT
   default = {
     custom_image = null
