@@ -1,10 +1,9 @@
 locals {
-  name      = coalesce(var.name, "redis")
-  namespace = coalesce(var.namespace, "database")
-  image     = coalesce(var.custom_image, "bitnami/redis")
-  image_tag = coalesce(var.image_tag, "latest")
-
-  redis_password = var.custom_redis_password == null ? nonsensitive(resource.random_password.redis_password.result) : var.custom_redis_password
+  name           = coalesce(var.name, "redis")
+  namespace      = coalesce(var.namespace, "database")
+  image          = coalesce(var.custom_image, "bitnami/redis")
+  image_tag      = coalesce(var.image_tag, "latest")
+  redis_password = coalesce(var.redis_custom_password, nonsensitive(resource.random_password.redis_password.result))
 
   env = merge(
     {
@@ -23,16 +22,19 @@ locals {
     }
   )
 
-  mounts = setunion(
+  mounts = concat(
     [{
-      target         = "/bitnami/redis/data"
-      source         = module.redis_docker_volume.this.name
-      type           = "volume"
-      read_only      = false
-      tmpfs_options  = null
-      volume_options = null
+      target        = "/bitnami/redis/data"
+      source        = module.redis_docker_volume.this.name
+      type          = "volume"
+      read_only     = false
+      tmpfs_options = null
+      volume_options = {
+        driver_name    = var.redis_volume_options.driver
+        driver_options = var.redis_volume_options.driver_options
+      }
     }],
-    var.mounts
+    tolist(var.mounts)
   )
 
   ports = [
@@ -40,7 +42,7 @@ locals {
       name           = "redis"
       target_port    = 6379,
       protocol       = "tcp"
-      published_port = var.service_port
+      published_port = var.redis_service_port
       publish_mode   = "ingress"
     }
   ]
@@ -73,8 +75,10 @@ resource "random_password" "redis_password" {
 module "redis_docker_volume" {
   source = "github.com/ehwplus/terraswarm//modules/base_docker_volume?ref=main"
 
-  name      = local.name
-  namespace = local.namespace
+  name           = local.name
+  namespace      = local.namespace
+  driver         = var.redis_volume_options.driver
+  driver_options = var.redis_volume_options.driver_options
 }
 
 module "redis_docker_service" {

@@ -281,15 +281,25 @@ variable "healthcheck" {
 # Redis
 ################################################################################
 
-variable "service_port" {
+variable "redis_service_port" {
   type        = number
   description = "The external service port for Redis"
   nullable    = false
   default     = 6379
 }
 
-variable "custom_redis_password" {
+variable "redis_custom_password" {
   type        = string
   description = "A custom password for redis which will be used over the generated one."
   nullable    = true
+  default     = null
+}
+
+variable "redis_volume_options" {
+  type = object({
+    driver         = optional(string, "local")
+    driver_options = optional(map(string), {})
+  })
+  description = "The redis volume driver with its options."
+  default     = {}
 }

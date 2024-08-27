@@ -15,6 +15,6 @@ output "host" {
 }
 
 output "port" {
-  value       = var.service_port
+  value       = var.redis_service_port
   description = "The Redis service port."
 }
