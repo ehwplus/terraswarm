@@ -73,6 +73,7 @@ resource "random_password" "redis_password" {
 }
 
 module "redis_docker_volume" {
+  # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/base_docker_volume?ref=main"
 
   name           = local.name
@@ -82,6 +83,7 @@ module "redis_docker_volume" {
 }
 
 module "redis_docker_service" {
+  # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
   name            = local.name
