@@ -16,7 +16,6 @@ This module serves as a canonical foundation for higher level services.
 | Name | Version |
 |------|---------|
 | <a name="provider_docker"></a> [docker](#provider\_docker) | 3.0.2 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
 
 ## Modules
 
@@ -29,7 +28,6 @@ No modules.
 | [docker_config.this](https://registry.terraform.io/providers/kreuzwerker/docker/3.0.2/docs/resources/config) | resource |
 | [docker_secret.this](https://registry.terraform.io/providers/kreuzwerker/docker/3.0.2/docs/resources/secret) | resource |
 | [docker_service.this](https://registry.terraform.io/providers/kreuzwerker/docker/3.0.2/docs/resources/service) | resource |
-| [null_resource.update_deployed_at](https://registry.terraform.io/providers/hashicorp/null/3.2.2/docs/resources/resource) | resource |
 
 ## Inputs
 

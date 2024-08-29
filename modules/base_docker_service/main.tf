@@ -47,19 +47,6 @@ locals {
   )
 }
 
-resource "null_resource" "update_deployed_at" {
-  provisioner "local-exec" {
-    command    = "docker service update --label-add deployed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ) ${docker_service.this.name}"
-    on_failure = continue
-  }
-
-  triggers = {
-    deployed_at = timestamp() # This triggers the update when the resource is applied.
-  }
-
-  depends_on = [docker_service.this]
-}
-
 resource "docker_service" "this" {
   name = substr(join("_", compact([var.namespace, "svc", var.name, uuid()])), 0, 63)
 
