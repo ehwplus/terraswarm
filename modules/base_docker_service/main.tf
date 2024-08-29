@@ -28,7 +28,6 @@ locals {
     controlled_by                   = "terraform"
     "io.terraform.provider.source"  = "kreuzwerker/docker"
     "io.terraform.provider.version" = "3.0.2"
-    deployed_at                     = timestamp()
   }
   common_svc_labels = {
     "com.docker.stack.image" = "${var.image}:${var.image_tag}"
@@ -48,6 +47,18 @@ locals {
   )
 }
 
+resource "null_resource" "update_deployed_at" {
+  provisioner "local-exec" {
+    command    = "docker service update --label-add deployed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ) ${docker_service.this.name}"
+    on_failure = continue
+  }
+
+  triggers = {
+    deployed_at = timestamp() # This triggers the update when the resource is applied.
+  }
+
+  depends_on = [docker_service.this]
+}
 
 resource "docker_service" "this" {
   name = substr(join("_", compact([var.namespace, "svc", var.name, uuid()])), 0, 63)
@@ -264,9 +275,9 @@ resource "docker_service" "this" {
     order          = length(var.ports) > 0 ? "stop-first" : "start-first"
   }
 
-  lifecycle {
-    ignore_changes        = [name]
-    create_before_destroy = false
-  }
   depends_on = [docker_config.this, docker_secret.this]
+  lifecycle {
+    // best effort ignore deployed_at label: https://github.com/hashicorp/terraform/issues/26359#issuecomment-1743684339
+    ignore_changes = [name]
+  }
 }

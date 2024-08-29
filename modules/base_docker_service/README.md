@@ -9,12 +9,14 @@ This module serves as a canonical foundation for higher level services.
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.2 |
 | <a name="requirement_docker"></a> [docker](#requirement\_docker) | 3.0.2 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | 3.2.2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_docker"></a> [docker](#provider\_docker) | 3.0.2 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
 
 ## Modules
 
@@ -27,6 +29,7 @@ No modules.
 | [docker_config.this](https://registry.terraform.io/providers/kreuzwerker/docker/3.0.2/docs/resources/config) | resource |
 | [docker_secret.this](https://registry.terraform.io/providers/kreuzwerker/docker/3.0.2/docs/resources/secret) | resource |
 | [docker_service.this](https://registry.terraform.io/providers/kreuzwerker/docker/3.0.2/docs/resources/service) | resource |
+| [null_resource.update_deployed_at](https://registry.terraform.io/providers/hashicorp/null/3.2.2/docs/resources/resource) | resource |
 
 ## Inputs
 
@@ -48,7 +51,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | The service name which must not be longer than 63 characters. This name will also be used as a network alias for all attached networks. | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | (Optional) The namespace of Docker Swarm | `string` | `null` | no |
 | <a name="input_network_aliases"></a> [network\_aliases](#input\_network\_aliases) | (Optional) Aliases (alternative hostnames) for this service on all specified networks. Other containers on the same network can use either the service name or this alias to connect to one of the service's containers. See https://docs.docker.com/compose/compose-file/compose-file-v3/#aliases for more information. | `list(string)` | `[]` | no |
-| <a name="input_networks"></a> [networks](#input\_networks) | (Optional) The networks attached to this service | `set(string)` | `[]` | no |
+| <a name="input_networks"></a> [networks](#input\_networks) | (Optional) Attaches this service to the following network IDs. You can also supply names but those will force replacement in the terraform state. | `set(string)` | `[]` | no |
 | <a name="input_ports"></a> [ports](#input\_ports) | (Optional) The ports to expose on the swarm for the service.<br><br>    ports = [{<br>      target\_port    = The port inside the container.<br>      name           = A random name for the port.<br>      protocol       = Represents the protocol of a port: tcp, udp or sctp. Defaults to 'tcp'.<br>      publish\_mode   = Represents the mode in which the port is to be published: 'ingress' or 'host'. Defaults to 'ingress'.<br>      published\_port = The port on the swarm hosts.<br>    }] | <pre>list(object({<br>    target_port    = number,<br>    name           = optional(string),<br>    protocol       = optional(string, "tcp"),<br>    publish_mode   = optional(string, "ingress")<br>    published_port = optional(number),<br>  }))</pre> | `[]` | no |
 | <a name="input_reservation"></a> [reservation](#input\_reservation) | (Optional) The resource reservation of service, memory unit is MB | <pre>object({<br>    cores  = optional(number)<br>    memory = optional(number)<br>    generic_resources = optional(object({<br>      discrete_resources_spec = optional(set(string))<br>      named_resources_spec    = optional(set(string))<br>    }))<br>  })</pre> | `null` | no |
 | <a name="input_restart_policy"></a> [restart\_policy](#input\_restart\_policy) | (Optional) Restart policy for containers.<br><br>    restart\_policy = {<br>      condition    = Condition for restart; possible options are "none" which does not automatically restart, "on-failure" restarts on non-zero exit, "any" (default) restarts regardless of exit status.<br>      delay        = Delay between restart attempts (default is 5s) (ms\|s\|m\|h).<br>      max\_attempts = How many times to attempt to restart a container before giving up (default: 0, i.e. never give up). If the restart does not succeed within the configured window, this attempt doesn't count toward the configured max\_attempts value. For example, if max\_attempts is set to '2', and the restart fails on the first attempt, more than two restarts must be attempted.<br>      window       = The time window used to evaluate the restart policy (default value is 5s, 0 means unbounded) (ms\|s\|m\|h).<br>    } | <pre>object({<br>    condition    = optional(string, "any")<br>    delay        = optional(string, "5s")<br>    max_attempts = optional(number, 0)<br>    window       = optional(string, "5s")<br>  })</pre> | <pre>{<br>  "condition": "any",<br>  "delay": "5s",<br>  "max_attempts": 0,<br>  "window": "5s"<br>}</pre> | no |

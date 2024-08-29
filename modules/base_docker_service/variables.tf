@@ -242,7 +242,7 @@ variable "restart_policy" {
 # TODO join var.networks and network_aliases to have different hostnames per network?
 variable "networks" {
   type        = set(string)
-  description = "(Optional) The networks attached to this service"
+  description = "(Optional) Attaches this service to the following network IDs. You can also supply names but those will force replacement in the terraform state."
   default     = []
 }
 variable "network_aliases" {
