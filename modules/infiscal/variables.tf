@@ -375,28 +375,273 @@ variable "healthcheck" {
 
 variable "infiscal_application_port" {
   type        = string
-  description = "The zitadel internal port. Make sure to have this in sync with your custom config if set."
+  description = "The infisical external port."
   nullable    = false
   default     = 8080
 }
 
-variable "infiscal_redis_port" {
-  type        = string
-  description = "The zitadel internal port. Make sure to have this in sync with your custom config if set."
-  nullable    = false
-  default     = 6379
-}
-
-variable "infiscal_database_port" {
-  type        = string
-  description = "The zitadel internal port. Make sure to have this in sync with your custom config if set."
-  nullable    = false
-  default     = 5432
-}
-
 variable "infiscal_site_url" {
   type        = string
-  description = "The zitadel internal port. Make sure to have this in sync with your custom config if set."
-  nullable    = false
-  default     = "http://localhost:8080"
+  description = "Must be an absolute URL including the protocol (e.g. https://app.infisical.com)."
+  nullable    = true
+  default     = "http://localhost:$infiscal_application_port"
+}
+
+################################################################################
+# PostgreSQL
+################################################################################
+
+variable "postgresql" {
+  type = object({
+    custom_image = optional(string, null)
+    image_tag    = optional(string, "latest")
+    args         = optional(list(string), null)
+    env          = optional(map(string), null)
+    mounts = optional(set(object({
+      target    = string
+      type      = string
+      read_only = optional(bool, false)
+      source    = optional(string)
+      tmpfs_options = optional(object({
+        mode       = optional(number)
+        size_bytes = optional(number)
+      }), null)
+      volume_options = optional(object({
+        driver_name    = optional(string)
+        driver_options = optional(map(string))
+        labels         = optional(map(string))
+        no_copy        = optional(bool)
+      }), {})
+    })), [])
+    labels      = optional(map(string), {})
+    constraints = optional(set(string), [])
+    limit = optional(object({
+      cores  = optional(number)
+      memory = optional(number)
+    }), null)
+    reservation = optional(object({
+      cores  = optional(number)
+      memory = optional(number)
+      generic_resources = optional(object({
+        discrete_resources_spec = optional(set(string))
+        named_resources_spec    = optional(set(string))
+      }))
+    }), null)
+    restart_policy = optional(object({
+      condition    = optional(string, "any")
+      delay        = optional(string, "5s")
+      max_attempts = optional(number, 0)
+      window       = optional(string, "5s")
+      }), {
+      condition    = "any"
+      delay        = "5s"
+      max_attempts = 0
+      window       = "5s"
+    })
+    auth = optional(object({
+      server_address = optional(string)
+      username       = string
+      password       = string
+    }), null)
+    healthcheck = optional(object({
+      test         = list(string)
+      interval     = optional(string, "0s")
+      timeout      = optional(string, "0s")
+      retries      = optional(number, 0)
+      start_period = optional(string, "0s")
+    }), null)
+    postgres_volume_options = optional(object({
+      driver_name    = optional(string)
+      driver_options = optional(map(string))
+      labels         = optional(map(string))
+      no_copy        = optional(bool)
+    }), {})
+    postgres_service_port = optional(number, 5432)
+  })
+  description = <<EOT
+    Configuration for the PostgreSQL service to be used with Zitadel.
+
+    - custom_image: (Optional) The docker image name excluding the image tag.
+    - image_tag: (Optional) The image tag of the docker image. Defaults to: latest.
+    - args: (Optional) The arguments to pass to the docker image.
+    - env: (Optional) The environmental variables to pass to the docker image.
+    - mounts: (Optional) Mounts of this docker service.
+    - labels: (Optional) Labels to add to the service and container.
+    - constraints: (Optional) The container placement constraints.
+    - limit: (Optional) The resources limit of service, memory unit is MB.
+    - reservation: (Optional) The resource reservation of service, memory unit is MB.
+    - restart_policy: (Optional) Restart policy for containers.
+    - auth: (Optional) The authentication for a private docker registry.
+    - healthcheck: (Optional) Healthcheck configuration for the container.
+    - postgres_volume_options: (Optional) The PostgreSQL data volume driver with its options.
+    - postgres_service_port: (Optional) The external service port for PostgreSQL. Defaults to 5432.
+  EOT
+  default = {
+    custom_image = null
+    image_tag    = "latest"
+    args         = null
+    env          = null
+    mounts       = []
+    labels       = {}
+    constraints  = []
+    limit        = null
+    reservation  = null
+    restart_policy = {
+      condition    = "any"
+      delay        = "5s"
+      max_attempts = 0
+      window       = "5s"
+    }
+    auth        = null
+    healthcheck = null
+    postgres_volume_options = {
+      driver_name    = "local"
+      driver_options = {}
+      labels         = {}
+    }
+    postgres_service_port = 5432
+  }
+}
+
+################################################################################
+# Redis
+################################################################################
+
+variable "redis" {
+  type = object({
+    custom_image = optional(string, null)
+    image_tag    = optional(string, "latest")
+    args         = optional(list(string), null)
+    env          = optional(map(string), null)
+    secrets = optional(set(object({
+      file_name   = string
+      file_gid    = optional(string, "0")
+      file_mode   = optional(number, 0444)
+      file_uid    = optional(string, "0")
+      secret_name = optional(string, null)
+      secret_data = string
+    })), [])
+    secret_map = optional(map(object({
+      file_name   = string
+      file_gid    = optional(string, "0")
+      file_mode   = optional(number, 0444)
+      file_uid    = optional(string, "0")
+      secret_name = optional(string, null)
+      secret_data = string
+    })), {})
+    mounts = optional(set(object({
+      target    = string
+      type      = string
+      read_only = optional(bool, false)
+      source    = optional(string)
+      tmpfs_options = optional(object({
+        mode       = optional(number)
+        size_bytes = optional(number)
+      }), null)
+      volume_options = optional(object({
+        driver_name    = optional(string)
+        driver_options = optional(map(string))
+        labels         = optional(map(string))
+        no_copy        = optional(bool)
+      }), {})
+    })), [])
+    labels      = optional(map(string), {})
+    constraints = optional(set(string), [])
+    limit = optional(object({
+      cores  = optional(number)
+      memory = optional(number)
+    }), null)
+    reservation = optional(object({
+      cores  = optional(number)
+      memory = optional(number)
+      generic_resources = optional(object({
+        discrete_resources_spec = optional(set(string))
+        named_resources_spec    = optional(set(string))
+      }))
+    }), null)
+    restart_policy = optional(object({
+      condition    = optional(string, "any")
+      delay        = optional(string, "5s")
+      max_attempts = optional(number, 0)
+      window       = optional(string, "5s")
+      }), {
+      condition    = "any"
+      delay        = "5s"
+      max_attempts = 0
+      window       = "5s"
+    })
+    mode = optional(object({
+      global = optional(bool, false)
+      replicated = optional(object({
+        replicas = number
+      }), { replicas = 1 })
+      }), {
+      global     = false
+      replicated = { replicas = 1 }
+    })
+    healthcheck = optional(object({
+      test         = list(string)
+      interval     = optional(string, "0s")
+      timeout      = optional(string, "0s")
+      retries      = optional(number, 0)
+      start_period = optional(string, "0s")
+    }), null)
+    redis_service_port    = optional(number, 6379)
+    redis_custom_password = optional(string, null)
+    redis_volume_options = optional(object({
+      driver         = optional(string, "local")
+      driver_options = optional(map(string), {})
+    }), {})
+  })
+  description = <<EOT
+    Configuration for the redis service.
+
+    - custom_image: (Optional) The docker image name excluding the image tag.
+    - image_tag: (Optional) The image tag of the docker image. Defaults to: latest.
+    - args: (Optional) The arguments to pass to the docker image.
+    - env: (Optional) The environmental variables to pass to the docker image.
+    - secrets: (Optional) The secrets to create with and add to the docker container.
+    - secret_map: (Optional) Similar to the secrets variable but allows for docker secret creation from terraform resources.
+    - mounts: (Optional) Mounts of this docker service.
+    - labels: (Optional) Labels to add to the service and container.
+    - constraints: (Optional) The container placement constraints.
+    - limit: (Optional) The resources limit of service, memory unit is MB.
+    - reservation: (Optional) The resource reservation of service, memory unit is MB.
+    - restart_policy: (Optional) Restart policy for containers.
+    - mode: (Optional) The service mode. Defaults to 'replicated' with replicas set to 1.
+    - healthcheck: (Optional) Healthcheck configuration for the container.
+    - redis_service_port: (Optional) The external service port for Redis. Defaults to 6379.
+    - redis_custom_password: (Optional) A custom password for Redis.
+    - redis_volume_options: (Optional) The redis volume driver with its options.
+  EOT
+  default = {
+    custom_image = null
+    image_tag    = "latest"
+    args         = null
+    env          = null
+    secrets      = []
+    secret_map   = {}
+    mounts       = []
+    labels       = {}
+    constraints  = []
+    limit        = null
+    reservation  = null
+    restart_policy = {
+      condition    = "any"
+      delay        = "5s"
+      max_attempts = 0
+      window       = "5s"
+    }
+    mode = {
+      global     = false
+      replicated = { replicas = 1 }
+    }
+    healthcheck           = null
+    redis_service_port    = 6379
+    redis_custom_password = null
+    redis_volume_options = {
+      driver         = "local"
+      driver_options = {}
+    }
+  }
 }
