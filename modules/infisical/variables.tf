@@ -586,8 +586,7 @@ variable "redis" {
       retries      = optional(number, 0)
       start_period = optional(string, "0s")
     }), null)
-    redis_service_port    = optional(number, 6379)
-    redis_custom_password = optional(string, null)
+    redis_service_port = optional(number, 6379)
     redis_volume_options = optional(object({
       driver         = optional(string, "local")
       driver_options = optional(map(string), {})
@@ -611,7 +610,6 @@ variable "redis" {
     - mode: (Optional) The service mode. Defaults to 'replicated' with replicas set to 1.
     - healthcheck: (Optional) Healthcheck configuration for the container.
     - redis_service_port: (Optional) The external service port for Redis. Defaults to 6379.
-    - redis_custom_password: (Optional) A custom password for Redis.
     - redis_volume_options: (Optional) The redis volume driver with its options.
   EOT
   default = {
