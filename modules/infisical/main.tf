@@ -116,7 +116,7 @@ module "infisical_db_migration_docker_service" {
   networks       = [docker_network.this.id]
 
   env = merge({
-    DB_CONNECTION_URI = "postgres://${nonsensitive(module.postgres_docker_service.user)}:${nonsensitive(module.postgres_docker_service.password)}@${module.postgres_docker_service.host}:${module.postgres_docker_service.port}/${var.name}"
+    DB_CONNECTION_URI = "postgres://${nonsensitive(module.postgres_docker_service.user)}:${nonsensitive(module.postgres_docker_service.password)}@${module.postgres_docker_service.host}:5432/${var.name}"
   }, var.env)
 
   depends_on = [docker_network.this, module.postgres_docker_service]
@@ -148,7 +148,7 @@ module "infisical_docker_service" {
   env = merge({
     ENCRYPTION_KEY    = nonsensitive(resource.random_password.encryption_key.result)
     AUTH_SECRET       = nonsensitive(resource.random_bytes.jwt_auth_secret.base64)
-    DB_CONNECTION_URI = "postgres://${nonsensitive(module.postgres_docker_service.user)}:${nonsensitive(module.postgres_docker_service.password)}@${module.postgres_docker_service.host}:${module.postgres_docker_service.port}/${var.name}"
+    DB_CONNECTION_URI = "postgres://${nonsensitive(module.postgres_docker_service.user)}:${nonsensitive(module.postgres_docker_service.password)}@${module.postgres_docker_service.host}:5432/${var.name}"
     REDIS_URL         = "redis://:${nonsensitive(module.redis_docker_service.password)}@${module.redis_docker_service.host}:${module.redis_docker_service.port}",
     NODE_ENV          = "production"
     SITE_URL          = coalesce(var.infisical_site_url, "http://localhost:${var.infisical_application_port}")
