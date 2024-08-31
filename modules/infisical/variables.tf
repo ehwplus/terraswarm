@@ -595,8 +595,10 @@ variable "redis" {
     }), null)
     redis_service_port = optional(number, 6379)
     redis_volume_options = optional(object({
-      driver         = optional(string, "local")
-      driver_options = optional(map(string), {})
+      driver_name    = optional(string)
+      driver_options = optional(map(string))
+      labels         = optional(map(string))
+      no_copy        = optional(bool)
     }), {})
   })
   description = <<EOT
@@ -645,8 +647,9 @@ variable "redis" {
     redis_service_port    = 6379
     redis_custom_password = null
     redis_volume_options = {
-      driver         = "local"
+      driver_name    = "local"
       driver_options = {}
+      labels         = {}
     }
   }
 }
