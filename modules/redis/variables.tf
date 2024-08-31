@@ -297,8 +297,10 @@ variable "redis_custom_password" {
 
 variable "redis_volume_options" {
   type = object({
-    driver         = optional(string, "local")
-    driver_options = optional(map(string), {})
+    driver_name    = optional(string)
+    driver_options = optional(map(string))
+    labels         = optional(map(string))
+    no_copy        = optional(bool)
   })
   description = "The redis volume driver with its options."
   default     = {}

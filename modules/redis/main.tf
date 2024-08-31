@@ -24,15 +24,12 @@ locals {
 
   mounts = concat(
     [{
-      target        = "/bitnami/redis/data"
-      source        = module.redis_docker_volume.this.name
-      type          = "volume"
-      read_only     = false
-      tmpfs_options = null
-      volume_options = {
-        driver_name    = var.redis_volume_options.driver
-        driver_options = var.redis_volume_options.driver_options
-      }
+      target         = "/bitnami/redis/data"
+      source         = module.redis_docker_volume.this.name
+      type           = "volume"
+      read_only      = false
+      tmpfs_options  = null
+      volume_options = var.redis_volume_options
     }],
     tolist(var.mounts)
   )
@@ -78,7 +75,7 @@ module "redis_docker_volume" {
 
   name           = local.name
   namespace      = local.namespace
-  driver         = var.redis_volume_options.driver
+  driver         = var.redis_volume_options.driver_name
   driver_options = var.redis_volume_options.driver_options
 }
 
