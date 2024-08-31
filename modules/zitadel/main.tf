@@ -47,7 +47,7 @@ locals {
   # ]
   # secrets = length(var.secrets) == 0 ? local.zitadel_secrets : concat(local.zitadel_secrets, tolist(var.secrets))
 
-  networks = toset(concat([docker_network.this.name], tolist(var.networks)))
+  networks = toset(concat([docker_network.this.id], tolist(var.networks)))
 
   zitadel_port = var.zitadel_service_port # TODO: potentially causes issues when Port mismatches Zitadel config
   zitadel_ports = concat([
@@ -71,12 +71,13 @@ resource "random_password" "masterkey" {
 }
 
 module "postgres_docker_service" {
+  # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/postgresql?ref=main"
 
   name              = local.database_name
   namespace         = local.namespace
   service_port      = local.database_port
-  networks          = [docker_network.this.name]
+  networks          = [docker_network.this.id]
   postgres_database = var.name
 
   custom_image            = var.postgresql.custom_image
@@ -97,6 +98,7 @@ module "postgres_docker_service" {
 }
 
 module "zitadel_docker_service" {
+  # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
   name        = local.name
