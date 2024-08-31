@@ -57,9 +57,12 @@ For more information on Docker Swarm and Terraform, visit their respective offic
 - [Docker Swarm](https://docs.docker.com/engine/swarm/)
 - [Terraform](https://www.terraform.io/docs/)
 
-
 ## Contributing
 
 Please feel free to contribute your own modules. Modules shall be based on top of the [base_docker_service](./modules/base_docker_service/) and [base_docker_volume](./modules/base_docker_volume/).
 
 We :heart: contributions! If you'd like to help improve `Terraswarm`, please open up a PR.
+
+<p align="center">
+Made in :de: Germany
+</p>
