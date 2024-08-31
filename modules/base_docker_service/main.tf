@@ -48,7 +48,7 @@ locals {
 }
 
 resource "docker_service" "this" {
-  name = substr(join("_", compact([var.namespace, "svc", var.name, uuid()])), 0, 63)
+  name = trim(substr(join("_", compact([var.namespace, "svc", var.name, uuid()])), 0, 63), "-_ ")
 
   dynamic "labels" {
     for_each = var.namespace == null ? [] : [1]
