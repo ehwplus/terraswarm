@@ -380,6 +380,13 @@ variable "infisical_application_port" {
   default     = 8080
 }
 
+variable "infisical_internal_port" {
+  type        = string
+  description = "The infisical internal port."
+  nullable    = false
+  default     = 8080
+}
+
 variable "infisical_site_url" {
   type        = string
   description = "Must be an absolute URL including the protocol (e.g. https://app.infisical.com)."

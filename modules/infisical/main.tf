@@ -7,7 +7,6 @@ locals {
   image                               = coalesce(var.custom_image, "infisical/infisical")
   image_tag                           = coalesce(var.image_tag, "latest-postgres")
   infisical_database_migration_prefix = "postgres-migration"
-  infisical_internal_port             = 8080
 
   db_migration_command = compact([
     "npm",
@@ -18,7 +17,7 @@ locals {
   infisical_ports = concat([
     {
       name           = "infisical"
-      target_port    = local.infisical_internal_port
+      target_port    = var.infisical_internal_port
       protocol       = "tcp"
       published_port = var.infisical_application_port
       publish_mode   = "ingress"
@@ -154,7 +153,7 @@ module "infisical_docker_service" {
     NODE_ENV          = "production"
     SITE_URL          = coalesce(var.infisical_site_url, "http://localhost:${var.infisical_application_port}")
     TELEMETRY_ENABLED = false
-    PORT              = local.infisical_internal_port
+    PORT              = var.infisical_internal_port
   }, var.env)
 
   depends_on = [module.postgres_docker_service, module.redis_docker_service.password, module.infisical_db_migration_docker_service]
