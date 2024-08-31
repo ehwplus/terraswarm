@@ -370,21 +370,21 @@ variable "healthcheck" {
 }
 
 ################################################################################
-# Infiscal
+# Infisical
 ################################################################################
 
-variable "infiscal_application_port" {
+variable "infisical_application_port" {
   type        = string
   description = "The infisical external port."
   nullable    = false
   default     = 8080
 }
 
-variable "infiscal_site_url" {
+variable "infisical_site_url" {
   type        = string
   description = "Must be an absolute URL including the protocol (e.g. https://app.infisical.com)."
   nullable    = true
-  default     = "http://localhost:$infiscal_application_port"
+  default     = "http://localhost:$infisical_application_port"
 }
 
 ################################################################################

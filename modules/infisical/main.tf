@@ -2,12 +2,12 @@
 // https://raw.githubusercontent.com/Infisical/infisical/main/.env.example
 
 locals {
-  name                               = coalesce(var.name, "infiscal")
-  namespace                          = coalesce(var.namespace, "storage")
-  image                              = coalesce(var.custom_image, "infisical/infisical")
-  image_tag                          = coalesce(var.image_tag, "latest-postgres")
-  infiscal_database_migration_prefix = "postgres-migration"
-  infiscal_internal_port             = 8080
+  name                                = coalesce(var.name, "infisical")
+  namespace                           = coalesce(var.namespace, "storage")
+  image                               = coalesce(var.custom_image, "infisical/infisical")
+  image_tag                           = coalesce(var.image_tag, "latest-postgres")
+  infisical_database_migration_prefix = "postgres-migration"
+  infisical_internal_port             = 8080
 
   db_migration_command = compact([
     "npm",
@@ -15,12 +15,12 @@ locals {
     "migration:latest"
   ])
 
-  infiscal_ports = concat([
+  infisical_ports = concat([
     {
-      name           = "infiscal"
-      target_port    = local.infiscal_internal_port
+      name           = "infisical"
+      target_port    = local.infisical_internal_port
       protocol       = "tcp"
-      published_port = var.infiscal_application_port
+      published_port = var.infisical_application_port
       publish_mode   = "ingress"
     }
   ], var.ports)
@@ -104,11 +104,11 @@ module "redis_docker_service" {
   depends_on = [docker_network.this]
 }
 
-module "infiscal_db_migration_docker_service" {
+module "infisical_db_migration_docker_service" {
   # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
-  name           = "${local.infiscal_database_migration_prefix}-${local.name}"
+  name           = "${local.infisical_database_migration_prefix}-${local.name}"
   namespace      = local.namespace
   image          = local.image
   image_tag      = local.image_tag
@@ -123,7 +123,7 @@ module "infiscal_db_migration_docker_service" {
   depends_on = [docker_network.this, module.postgres_docker_service]
 }
 
-module "infiscal_docker_service" {
+module "infisical_docker_service" {
   # trunk-ignore(tflint/terraform_module_pinned_source)
   source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
 
@@ -132,7 +132,7 @@ module "infiscal_docker_service" {
   image           = local.image
   image_tag       = local.image_tag
   networks        = toset(concat([docker_network.this.id], tolist(var.networks)))
-  ports           = local.infiscal_ports
+  ports           = local.infisical_ports
   secrets         = var.secrets
   args            = var.args
   constraints     = var.constraints
@@ -152,10 +152,10 @@ module "infiscal_docker_service" {
     DB_CONNECTION_URI = "postgres://${nonsensitive(module.postgres_docker_service.user)}:${nonsensitive(module.postgres_docker_service.password)}@${module.postgres_docker_service.host}:${module.postgres_docker_service.port}/${var.name}"
     REDIS_URL         = "redis://:${nonsensitive(module.redis_docker_service.password)}@${module.redis_docker_service.host}:${module.redis_docker_service.port}",
     NODE_ENV          = "production"
-    SITE_URL          = coalesce(var.infiscal_site_url, "http://localhost:${var.infiscal_application_port}")
+    SITE_URL          = coalesce(var.infisical_site_url, "http://localhost:${var.infisical_application_port}")
     TELEMETRY_ENABLED = false
-    PORT              = local.infiscal_internal_port
+    PORT              = local.infisical_internal_port
   }, var.env)
 
-  depends_on = [module.postgres_docker_service, module.redis_docker_service.password, module.infiscal_db_migration_docker_service]
+  depends_on = [module.postgres_docker_service, module.redis_docker_service.password, module.infisical_db_migration_docker_service]
 }

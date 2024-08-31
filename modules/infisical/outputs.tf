@@ -10,12 +10,12 @@ output "redis_service" {
 
 output "jwt_auth_secret" {
   value       = random_bytes.jwt_auth_secret
-  description = "The Infiscal auth secret."
+  description = "The Infisical auth secret."
   sensitive   = true
 }
 
 output "encryption_key" {
   value       = random_password.encryption_key
-  description = "The Infiscal encryption key."
+  description = "The Infisical encryption key."
   sensitive   = true
 }

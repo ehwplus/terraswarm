@@ -22,8 +22,8 @@ See https://raw.githubusercontent.com/Infisical/infisical/main/.env.example for 
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_infiscal_db_migration_docker_service"></a> [infiscal\_db\_migration\_docker\_service](#module\_infiscal\_db\_migration\_docker\_service) | github.com/ehwplus/terraswarm//modules/base_docker_service | main |
-| <a name="module_infiscal_docker_service"></a> [infiscal\_docker\_service](#module\_infiscal\_docker\_service) | github.com/ehwplus/terraswarm//modules/base_docker_service | main |
+| <a name="module_infisical_db_migration_docker_service"></a> [infisical\_db\_migration\_docker\_service](#module\_infisical\_db\_migration\_docker\_service) | github.com/ehwplus/terraswarm//modules/base_docker_service | main |
+| <a name="module_infisical_docker_service"></a> [infisical\_docker\_service](#module\_infisical\_docker\_service) | github.com/ehwplus/terraswarm//modules/base_docker_service | main |
 | <a name="module_postgres_docker_service"></a> [postgres\_docker\_service](#module\_postgres\_docker\_service) | github.com/ehwplus/terraswarm//modules/postgresql | main |
 | <a name="module_redis_docker_service"></a> [redis\_docker\_service](#module\_redis\_docker\_service) | github.com/ehwplus/terraswarm//modules/redis | main |
 
@@ -47,8 +47,8 @@ See https://raw.githubusercontent.com/Infisical/infisical/main/.env.example for 
 | <a name="input_env"></a> [env](#input\_env) | (Optional) The environmental variables to pass to the docker image | `map(string)` | `null` | no |
 | <a name="input_healthcheck"></a> [healthcheck](#input\_healthcheck) | healthcheck = {<br>      test         = The test to be performed in CMD format.<br>      interval     = Time between running the check (ms\|s\|m\|h). Defaults to '0s'.<br>      timeout      = Maximum time to allow one check to run (ms\|s\|m\|h). Defaults to '0s'.<br>      retries      = Consecutive failures needed to report unhealthy. Defaults to '0'.<br>      start\_period = Start period for the container to initialize before counting retries towards unstable (ms\|s\|m\|h). Defaults to '0s'.<br>    } | <pre>object({<br>    test         = list(string)<br>    interval     = optional(string, "0s")<br>    timeout      = optional(string, "0s")<br>    retries      = optional(number, 0)<br>    start_period = optional(string, "0s")<br>  })</pre> | `null` | no |
 | <a name="input_image_tag"></a> [image\_tag](#input\_image\_tag) | (Optional) The image tag of the docker image. Defaults to: latest-postgres | `string` | `"latest-postgres"` | no |
-| <a name="input_infiscal_application_port"></a> [infiscal\_application\_port](#input\_infiscal\_application\_port) | The infisical external port. | `string` | `8080` | no |
-| <a name="input_infiscal_site_url"></a> [infiscal\_site\_url](#input\_infiscal\_site\_url) | Must be an absolute URL including the protocol (e.g. https://app.infisical.com). | `string` | `"http://localhost:$infiscal_application_port"` | no |
+| <a name="input_infisical_application_port"></a> [infisical\_application\_port](#input\_infisical\_application\_port) | The infisical external port. | `string` | `8080` | no |
+| <a name="input_infisical_site_url"></a> [infisical\_site\_url](#input\_infisical\_site\_url) | Must be an absolute URL including the protocol (e.g. https://app.infisical.com). | `string` | `"http://localhost:$infisical_application_port"` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | (Optional) Labels to add to the service and container | `map(string)` | `{}` | no |
 | <a name="input_limit"></a> [limit](#input\_limit) | (Optional) The resources limit of service, memory unit is MB | <pre>object({<br>    cores  = optional(number)<br>    memory = optional(number)<br>  })</pre> | `null` | no |
 | <a name="input_mode"></a> [mode](#input\_mode) | (Optional) The service mode. Defaults to 'replicated' with replicas set to 1.<br>    type = {<br>      global = The global service mode. Defaults to 'false'.<br>      replicated = {<br>        replicas = The amount of replicas of the service. Defaults to '1'.<br>      }<br>    } | <pre>object({<br>    global = optional(bool, false)<br>    replicated = optional(object({<br>      replicas = number<br>    }), { replicas = 1 })<br>  })</pre> | <pre>{<br>  "global": false,<br>  "replicated": {<br>    "replicas": 1<br>  }<br>}</pre> | no |
@@ -69,7 +69,7 @@ See https://raw.githubusercontent.com/Infisical/infisical/main/.env.example for 
 
 | Name | Description |
 |------|-------------|
-| <a name="output_encryption_key"></a> [encryption\_key](#output\_encryption\_key) | The Infiscal encryption key. |
-| <a name="output_jwt_auth_secret"></a> [jwt\_auth\_secret](#output\_jwt\_auth\_secret) | The Infiscal auth secret. |
+| <a name="output_encryption_key"></a> [encryption\_key](#output\_encryption\_key) | The Infisical encryption key. |
+| <a name="output_jwt_auth_secret"></a> [jwt\_auth\_secret](#output\_jwt\_auth\_secret) | The Infisical auth secret. |
 | <a name="output_redis_service"></a> [redis\_service](#output\_redis\_service) | The Redis service. |
 <!-- END_TF_DOCS -->
