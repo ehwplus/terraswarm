@@ -1,5 +1,5 @@
 resource "docker_volume" "this" {
-  name        = substr(join("_", compact([var.namespace, "vol", var.name, uuid()])), 0, 63)
+  name        = trim(substr(join("_", compact([var.namespace, "vol", var.name, uuid()])), 0, 63), "-_ ")
   driver      = var.driver
   driver_opts = var.driver_options
 
