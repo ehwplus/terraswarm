@@ -1,5 +1,5 @@
 resource "docker_volume" "this" {
-  name        = trim(substr(join("_", compact([var.namespace, "vol", var.name, uuid()])), 0, 63), "-_ ")
+  name        = trim(substr(join("_", compact([var.namespace, "vol", var.name, replace(uuid(), "-", "")])), 0, 63), "-_ ")
   driver      = var.driver
   driver_opts = var.driver_options
 
@@ -24,11 +24,6 @@ resource "docker_volume" "this" {
   labels {
     label = "io.terraform.provider.version"
     value = "3.0.2"
-  }
-
-  labels {
-    label = "deployed_at"
-    value = timestamp()
   }
 
   lifecycle {
