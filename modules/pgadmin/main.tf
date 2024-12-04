@@ -38,7 +38,7 @@ locals {
     var.mounts
   )
 
-  configs = toset(compact([
+  configs = toset([
     for config in [
       {
         config_data = var.pgadmin_config_local
@@ -61,7 +61,7 @@ locals {
         file_mode   = 0444
       }
     ] : config if config.config_data != null
-  ]))
+  ])
 
   ports = var.service_port == null ? [] : [
     {
