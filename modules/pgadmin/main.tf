@@ -41,26 +41,26 @@ locals {
   configs = toset(compact([
     for config in [
       {
-        content   = var.pgadmin_config_local
-        filename  = "/pgadmin4/config_local.py"
-        file_mode = 0444
+        config_data = var.pgadmin_config_local
+        file_name   = "/pgadmin4/config_local.py"
+        file_mode   = 0444
       },
       {
-        content   = var.pgadmin_config_servers
-        filename  = "/pgadmin4/servers.json"
-        file_mode = 0444
+        config_data = var.pgadmin_config_servers
+        file_name   = "/pgadmin4/servers.json"
+        file_mode   = 0444
       },
       {
-        content   = var.pgadmin_config_tls_cert
-        filename  = "/pgadmin4/server.cert"
-        file_mode = 0444
+        config_data = var.pgadmin_config_tls_cert
+        file_name   = "/pgadmin4/server.cert"
+        file_mode   = 0444
       },
       {
-        content   = var.pgadmin_config_tls_key
-        filename  = "/pgadmin4/server.key"
-        file_mode = 0444
+        config_data = var.pgadmin_config_tls_key
+        file_name   = "/pgadmin4/server.key"
+        file_mode   = 0444
       }
-    ] : config if config.content != null
+    ] : config if config.config_data != null
   ]))
 
   ports = var.service_port == null ? [] : [
