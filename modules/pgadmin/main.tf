@@ -2,7 +2,7 @@ locals {
   name      = coalesce(var.name, "pgadmin")
   namespace = coalesce(var.namespace, "admin")
   image     = coalesce(var.custom_image, "dpage/pgadmin4") # https://hub.docker.com/r/dpage/pgadmin4
-  image_tag = coalesce(var.image_tag, "8.3")
+  image_tag = coalesce(var.image_tag, "8.13")
 
   env = merge(
     {
@@ -28,7 +28,7 @@ locals {
 
   mounts = setunion(
     # [{
-    #   target         = "/var/lib/postgresql/data"
+    #   target         = "/var/lib/pgadmin"
     #   source         = module.postgresql_docker_volume.this.name
     #   type           = "volume"
     #   read_only      = false
@@ -38,7 +38,32 @@ locals {
     var.mounts
   )
 
-  ports = [
+  configs = toset(compact([
+    for config in [
+      {
+        content   = var.pgadmin_config_local
+        filename  = "/pgadmin4/config_local.py"
+        file_mode = 0444
+      },
+      {
+        content   = var.pgadmin_config_servers
+        filename  = "/pgadmin4/servers.json"
+        file_mode = 0444
+      },
+      {
+        content   = var.pgadmin_config_tls_cert
+        filename  = "/pgadmin4/server.cert"
+        file_mode = 0444
+      },
+      {
+        content   = var.pgadmin_config_tls_key
+        filename  = "/pgadmin4/server.key"
+        file_mode = 0444
+      }
+    ] : config if config.content != null
+  ]))
+
+  ports = var.service_port == null ? [] : [
     {
       name           = "pgadmin"
       target_port    = 80,
@@ -48,19 +73,7 @@ locals {
     }
   ]
 
-  secrets = setunion(
-    [
-      # {
-      #   file_name   = "POSTGRES_USER"
-      #   secret_data = nonsensitive(resource.random_string.postgres_user.result)
-      # },
-      # {
-      #   file_name   = "POSTGRES_PASSWORD"
-      #   secret_data = local.database_password
-      # }
-    ],
-    var.secrets
-  )
+  secrets = setunion(var.secrets)
 
   secret_map = merge(var.secret_map, {
     for secret in local.secrets :
@@ -71,31 +84,21 @@ locals {
   })
 }
 
-# module "postgresql_docker_volume" {
-#   source = "github.com/ehwplus/terraswarm//modules/base_docker_volume?ref=main"
-
-#   name           = local.name
-#   namespace      = local.namespace
-#   driver         = var.postgres_volume_options.driver_name
-#   driver_options = var.postgres_volume_options.driver_options
-# }
-
 module "pgadmin_docker_service" {
-  # trunk-ignore(tflint/terraform_module_pinned_source)
-  source = "github.com/ehwplus/terraswarm//modules/base_docker_service?ref=main"
+  source = "github.com/ehwplus/terraswarm//modules/base_docker_service?depth=1&ref=base_docker_service%2Fv0.1.0"
 
-  name        = local.name
-  namespace   = local.namespace
-  image       = local.image
-  image_tag   = local.image_tag
-  mounts      = local.mounts
-  env         = local.env
-  secret_map  = local.secret_map
-  ports       = local.ports
-  healthcheck = local.healthcheck
-  args        = var.args
-  auth        = var.auth # container registry auth for private traefik images
-  # configs         = var.postgresql_config == null ? [] : [{ config_data = var.postgresql_config, file_name = local.this_postgresql_config_file, file_mode = 0400 }]
+  name            = local.name
+  namespace       = local.namespace
+  image           = local.image
+  image_tag       = local.image_tag
+  mounts          = local.mounts
+  env             = local.env
+  secret_map      = local.secret_map
+  ports           = local.ports
+  healthcheck     = local.healthcheck
+  args            = var.args
+  auth            = var.auth
+  configs         = local.configs
   constraints     = var.constraints
   labels          = var.labels
   limit           = var.limit

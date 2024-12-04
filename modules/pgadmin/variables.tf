@@ -304,8 +304,7 @@ variable "healthcheck" {
 variable "service_port" {
   type        = number
   description = "The external service port for PgAdmin"
-  nullable    = false
-  default     = 80
+  nullable    = true
 }
 
 variable "pgadmin_default_email" {
@@ -319,4 +318,32 @@ variable "pgadmin_default_password" {
   description = "The default password for PgAdmin"
   nullable    = false
   sensitive   = true
+}
+
+variable "pgadmin_config_local" {
+  type        = string
+  description = "(Optional) Contents of the config_local.py file to override pgAdmin configuration settings."
+  nullable    = true
+  default     = null
+}
+
+variable "pgadmin_config_servers" {
+  type        = string
+  description = "(Optional) Contents of the servers.json file to pre-load server definitions."
+  nullable    = true
+  default     = null
+}
+
+variable "pgadmin_config_tls_cert" {
+  type        = string
+  description = "(Optional) Contents of the server TLS certificate file."
+  nullable    = true
+  default     = null
+}
+
+variable "pgadmin_config_tls_key" {
+  type        = string
+  description = "(Optional) Contents of the server TLS key file."
+  nullable    = true
+  default     = null
 }
