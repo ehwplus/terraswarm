@@ -78,8 +78,12 @@ locals {
   secret_map = merge(var.secret_map, {
     for secret in local.secrets :
     secret.file_name => {
-      file_name   = secret.file_name,
       secret_data = secret.secret_data,
+      secret_name = secret.secret_name,
+      file_name   = secret.file_name,
+      file_uid    = secret.file_uid,
+      file_gid    = secret.file_gid,
+      file_mode   = secret.file_mode,
     }
   })
 }
