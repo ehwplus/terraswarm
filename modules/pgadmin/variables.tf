@@ -305,6 +305,7 @@ variable "service_port" {
   type        = number
   description = "The external service port for PgAdmin"
   nullable    = true
+  default     = null
 }
 
 variable "pgadmin_default_email" {
