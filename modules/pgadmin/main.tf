@@ -95,6 +95,7 @@ module "pgadmin_docker_service" {
   namespace       = local.namespace
   image           = local.image
   image_tag       = local.image_tag
+  command         = var.command
   mounts          = local.mounts
   env             = local.env
   secret_map      = local.secret_map

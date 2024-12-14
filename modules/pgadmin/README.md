@@ -28,6 +28,7 @@ No resources.
 |------|-------------|------|---------|:--------:|
 | <a name="input_args"></a> [args](#input\_args) | (Optional) The arguments to pass to the docker image | `list(string)` | `null` | no |
 | <a name="input_auth"></a> [auth](#input\_auth) | (Optional) The authentication for a private docker registry.<br><br>    auth = {<br>      server\_address = The address of the server for the authentication against a private docker registry.<br>      username       = The password.<br>      password       = The username.<br>    } | <pre>object({<br>    server_address = optional(string)<br>    username       = string<br>    password       = string<br>  })</pre> | `null` | no |
+| <a name="input_command"></a> [command](#input\_command) | (Optional) The command/entrypoint to be run in the image. According to the docker cli the override of the entrypoint is also passed to the command property and there is no entrypoint attribute in the ContainerSpec of the service. | `list(string)` | `null` | no |
 | <a name="input_constraints"></a> [constraints](#input\_constraints) | (Optional) The container placement constraints | `set(string)` | `[]` | no |
 | <a name="input_custom_image"></a> [custom\_image](#input\_custom\_image) | The docker image name excluding the image tag | `string` | `null` | no |
 | <a name="input_env"></a> [env](#input\_env) | (Optional) The environmental variables to pass to the docker image | `map(string)` | `null` | no |

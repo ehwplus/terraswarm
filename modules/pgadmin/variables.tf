@@ -28,6 +28,12 @@ variable "image_tag" {
   default     = "latest"
 }
 
+variable "command" {
+  type        = list(string)
+  description = "(Optional) The command/entrypoint to be run in the image. According to the docker cli the override of the entrypoint is also passed to the command property and there is no entrypoint attribute in the ContainerSpec of the service."
+  default     = null
+}
+
 variable "args" {
   type        = list(string)
   description = "(Optional) The arguments to pass to the docker image"
